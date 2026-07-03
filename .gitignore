@@ -1,0 +1,9 @@
+.modules
+.plan_cache.json
+.resource_types
+.task_cache.json
+.*.sw?
+bolt-debug.log
+Gemfile.lock
+Puppetfile
+/spec/fixtures/modules
