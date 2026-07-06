@@ -42,11 +42,14 @@
 plan ovox::subplans::install_openvox(
   TargetSpec $openvox_agent_targets,
   TargetSpec $openvox_server_targets = [],
+  TargetSpec $openvox_compiler_targets = [],
   TargetSpec $openvox_db_targets = [],
   Ovox::Openvox_install_params
     $openvox_agent_params = {},
   Ovox::Openvox_install_params
     $openvox_server_params = {},
+  Ovox::Openvox_install_params
+    $openvox_compiler_params = {},
   Ovox::Openvox_install_params
     $openvox_db_params = {},
   Ovox::Openvox_install_params
@@ -60,14 +63,16 @@ plan ovox::subplans::install_openvox(
 ) {
   # Resolve targets in case we were given hostname or inventory group
   # name references instead of Target objects.
-  $agent_targets  = get_targets($openvox_agent_targets)
-  $server_targets = get_targets($openvox_server_targets)
-  $db_targets     = get_targets($openvox_db_targets)
+  $agent_targets    = get_targets($openvox_agent_targets)
+  $server_targets   = get_targets($openvox_server_targets)
+  $compiler_targets = get_targets($openvox_compiler_targets)
+  $all_server_targets = [$server_targets, $compiler_targets].flatten().unique()
+  $db_targets       = get_targets($openvox_db_targets)
   $db_termini_targets = $install_termini ? {
-    true    => $server_targets,
+    true    => $all_server_targets,
     default => [],
   }
-  $all_targets    = [$agent_targets, $server_targets, $db_targets].flatten().unique()
+  $all_targets    = [$agent_targets, $all_server_targets, $db_targets].flatten().unique()
 
   $agent_version_results = run_plan(
     'ovox::subplans::install_component',
@@ -90,7 +95,10 @@ plan ovox::subplans::install_openvox(
   run_plan('facts', 'targets' => $all_targets)
 
   $server_installations = [
+    # XXX: There is a minor optimization that could be done here, if
+    # $openvox_server_params == $openvox_compiler_params...
     [$server_targets, 'openvox-server', $openvox_server_params],
+    [$compiler_targets, 'openvox-server', $openvox_compiler_params],
     [$db_targets, 'openvoxdb', $openvox_db_params],
     [$db_termini_targets, 'openvoxdb-termini', $openvox_db_params],
   ]
