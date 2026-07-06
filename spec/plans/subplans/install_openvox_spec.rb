@@ -1,6 +1,6 @@
 require 'spec_helper'
 
-describe 'plan: install_openvox' do
+describe 'plan: ovox::subplans::install_openvox' do
   include_context 'plan_init'
 
   def make_target(name)
@@ -40,7 +40,7 @@ describe 'plan: install_openvox' do
         'version' => '8.0.0',
       })
 
-    result = run_plan('ovox::install_openvox', params)
+    result = run_plan('ovox::subplans::install_openvox', params)
     expect(result.ok?).to(eq(true), result.value.to_s)
 
     version_map = result.value
@@ -69,7 +69,7 @@ describe 'plan: install_openvox' do
       })
     expect_task('package')
 
-    result = run_plan('ovox::install_openvox', params)
+    result = run_plan('ovox::subplans::install_openvox', params)
     expect(result.ok?).to(eq(true), result.value.to_s)
   end
 
@@ -89,7 +89,7 @@ describe 'plan: install_openvox' do
       })
     expect_task('package')
 
-    result = run_plan('ovox::install_openvox', params)
+    result = run_plan('ovox::subplans::install_openvox', params)
     expect(result.ok?).to(eq(true), result.value.to_s)
   end
 
@@ -110,7 +110,7 @@ describe 'plan: install_openvox' do
       })
     expect_task('package')
 
-    result = run_plan('ovox::install_openvox', params)
+    result = run_plan('ovox::subplans::install_openvox', params)
     expect(result.ok?).to(eq(true), result.value.to_s)
   end
 
@@ -208,7 +208,7 @@ describe 'plan: install_openvox' do
           'version' => '8.2.1',
         })
 
-      result = run_plan('ovox::install_openvox', params)
+      result = run_plan('ovox::subplans::install_openvox', params)
       expect(result.ok?).to(eq(true), result.value.to_s)
 
       version_map = result.value
@@ -275,7 +275,7 @@ describe 'plan: install_openvox' do
         })
       expect_task('package').be_called_times(4)
 
-      result = run_plan('ovox::install_openvox', params)
+      result = run_plan('ovox::subplans::install_openvox', params)
       expect(result.ok?).to(eq(true), result.value.to_s)
     end
 
@@ -333,7 +333,7 @@ describe 'plan: install_openvox' do
             'version' => 'v',
           })
 
-        result = run_plan('ovox::install_openvox', params)
+        result = run_plan('ovox::subplans::install_openvox', params)
         expect(result.ok?).to(eq(true), result.value.to_s)
 
         version_map = result.value
@@ -380,7 +380,7 @@ describe 'plan: install_openvox' do
             'version' => 'v',
           })
 
-        result = run_plan('ovox::install_openvox', params)
+        result = run_plan('ovox::subplans::install_openvox', params)
         expect(result.ok?).to(eq(true), result.value.to_s)
       end
     end
@@ -451,7 +451,7 @@ describe 'plan: install_openvox' do
             'version' => 'v',
           })
 
-        result = run_plan('ovox::install_openvox', params)
+        result = run_plan('ovox::subplans::install_openvox', params)
         expect(result.ok?).to(eq(true), result.value.to_s)
 
         version_map = result.value

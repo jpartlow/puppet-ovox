@@ -39,7 +39,7 @@
 #   of all installed OpenVox components. Useful for debugging in
 #   automated pipelines. If undef (default), the file will not
 #   be written.
-plan ovox::install_openvox(
+plan ovox::subplans::install_openvox(
   TargetSpec $openvox_agent_targets,
   TargetSpec $openvox_server_targets = [],
   TargetSpec $openvox_db_targets = [],
