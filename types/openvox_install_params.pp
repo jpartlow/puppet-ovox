@@ -12,6 +12,8 @@
 #   or to download and install a pre-release openvox_version package
 #   from the openvox_artifacts_url for dev testing.
 # - openvox_artifacts_url: The URL to the OpenVox artifacts server.
+#   Generally this can be skipped if the packages you are looking for
+#   are on the artifacts.voxpupuli.org server.
 type Ovox::Openvox_install_params = Struct[{
   Optional[openvox_version]       => Ovox::Openvox_version,
   Optional[openvox_collection]    => Ovox::Openvox_collection,
