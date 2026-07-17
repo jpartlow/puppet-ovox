@@ -1,0 +1,7 @@
+# Exclusion of modules/ovox works past the ovox symlink, modules/**
+# doesn't.
+#
+# Additionally excluding modules/** isn't necessary because I'm not
+# using .fixtures.yml here since it's a Bolt module and the modules
+# are available under .modules... (see spec/spec_helper.rb)
+--exclude-pattern '**/fixtures/modules/ovox/**/*_spec.rb'
