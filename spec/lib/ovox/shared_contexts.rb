@@ -99,6 +99,22 @@ RSpec.shared_context('shared target maps') do
     }
   end
 
+  # For ovox::subplans::determine_architecture
+  let(:t_params) do
+    {
+      'primary_host'          => primary.to_s,
+      'ovdb_hosts'            => [],
+      'postgres_hosts'        => [],
+      'compiler_hosts'        => [],
+      'compiler_lb_hosts'     => [],
+      'ovdb_lb_hosts'         => [],
+      'agent_hosts'           => [agent.to_s],
+      'manage_postgres'       => true,
+      'compiler_pool_address' => nil,
+      'ovdb_pool_address'     => nil,
+    }
+  end
+
   def unmanaged_postgres(target_map)
     target_map['manage_postgres'] = false
     target_map['postgres_targets'] = []
