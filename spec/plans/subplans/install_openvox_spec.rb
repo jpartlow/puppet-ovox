@@ -3,12 +3,7 @@ require 'spec_helper'
 describe 'plan: ovox::subplans::install_openvox' do
   include_context 'plan_init'
 
-  def make_target(name)
-    Bolt::Target.from_hash({'name' => name}, inventory)
-  end
-
-  let(:inventory) { Bolt::Inventory.empty }
-  let(:all_targets) { [ make_target('agent-1.rspec') ] }
+  let(:all_targets) { [ a_target('agent-1.rspec') ] }
   let(:params) do
     {
       'openvox_agent_targets' => all_targets,
@@ -115,8 +110,8 @@ describe 'plan: ovox::subplans::install_openvox' do
   end
 
   context 'with primary targets' do
-    let(:agent_targets) { [ make_target('agent-1.rspec') ] }
-    let(:primary_targets) { [ make_target('primary-1.rspec') ] }
+    let(:agent_targets) { [ a_target('agent-1.rspec') ] }
+    let(:primary_targets) { [ a_target('primary-1.rspec') ] }
     let(:all_targets) { agent_targets + primary_targets }
     let(:params) do
       {
@@ -386,8 +381,8 @@ describe 'plan: ovox::subplans::install_openvox' do
     end
 
     context 'with different server and db targets' do
-      let(:server_targets) { [ make_target('server-1.rspec') ] }
-      let(:db_targets) { [ make_target('db-1.rspec') ] }
+      let(:server_targets) { [ a_target('server-1.rspec') ] }
+      let(:db_targets) { [ a_target('db-1.rspec') ] }
       let(:all_targets) { agent_targets + server_targets + db_targets }
       let(:params) do
         {
