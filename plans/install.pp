@@ -20,7 +20,7 @@
 # @param ovdb_lb_hosts Array of haproxy load-balancers for the ovdb
 #   hosts.
 # @param agent_hosts Array of additional agents to provision.
-#   Note, the agent will also be installed on all of the above 
+#   Note, the agent will also be installed on all of the above
 #   server, compiler, compiler lbs, ovdb lbs, ovdb and postgres hosts,
 #   with the possible exception of $postgres_hosts if
 #   $manage_postgres is false.
@@ -106,12 +106,12 @@ plan ovox::install(
   # TODO: ha_proxy version?
 
   # Configuration
-  Boolean $install_termini                  = true,
-  Boolean $manage_postgres                  = true,
-  Optional[Hash] $postgres_credentials      = undef,
-  Optional[String] $compiler_pool_address   = undef,
-  Optional[String] $ovdb_pool_address       = undef,
-  Optional[Array[String[1]]] $dns_alt_names = undef,
+  Boolean $install_termini                   = true,
+  Boolean $manage_postgres                   = true,
+  Optional[Hash] $postgres_credentials       = undef,
+  Optional[String[1]] $compiler_pool_address = undef,
+  Optional[String[1]] $ovdb_pool_address     = undef,
+  Optional[Array[String[1]]] $dns_alt_names  = undef,
   # TODO: puppet-r10k parameters
   # TODO: CA parameters?
   # TODO: CSR parameters?
