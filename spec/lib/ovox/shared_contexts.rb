@@ -9,6 +9,8 @@ RSpec.shared_context('shared target maps') do
   let(:postgres) { a_target('postgres.spec') }
   let(:primary) { a_target('primary.spec') }
 
+  # For testing functions that take a TargetMap defining cluster
+  # architecture.
   let(:t_target_map) do
     {
       'primary_target'               => primary,
@@ -105,6 +107,21 @@ RSpec.shared_context('shared target maps') do
       'primary_host'          => primary.to_s,
       'ovdb_hosts'            => [],
       'postgres_hosts'        => [],
+      'compiler_hosts'        => [],
+      'compiler_lb_hosts'     => [],
+      'ovdb_lb_hosts'         => [],
+      'agent_hosts'           => [agent.to_s],
+      'manage_postgres'       => true,
+      'compiler_pool_address' => nil,
+      'ovdb_pool_address'     => nil,
+    }
+  end
+
+  let(:s_params) do
+    {
+      'primary_host'          => primary.to_s,
+      'ovdb_hosts'            => [primary.to_s],
+      'postgres_hosts'        => [primary.to_s],
       'compiler_hosts'        => [],
       'compiler_lb_hosts'     => [],
       'ovdb_lb_hosts'         => [],
