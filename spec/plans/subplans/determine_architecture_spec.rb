@@ -99,4 +99,20 @@ describe 'plan: ovox::subplans::determine_architecture' do
       )
     end
   end
+
+  context 'medium' do
+    it 'returns an arch_map'
+  end
+
+  context 'large' do
+    it 'returns an arch_map'
+  end
+
+  context 'huge' do
+    it 'returns an arch_map'
+  end
+
+  context 'custom' do
+    it 'returns an arch_map with ovdb and postgres on a separate node'
+  end
 end
