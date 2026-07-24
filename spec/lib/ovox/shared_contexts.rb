@@ -9,93 +9,70 @@ RSpec.shared_context('shared target maps') do
   let(:postgres) { a_target('postgres.spec') }
   let(:primary) { a_target('primary.spec') }
 
+  # For testing functions that take a TargetMap defining cluster
+  # architecture.
   let(:t_target_map) do
     {
-      'primary_target'               => primary,
       'server_targets'               => [primary],
       'compiler_targets'             => [],
       'compiler_lb_targets'          => [],
       'ovdb_targets'                 => [],
       'ovdb_lb_targets'              => [],
       'postgres_targets'             => [],
+      'unmanaged_postgres_hosts'   => [],
       'agent_targets'                => [agent],
-      'separate_ovdb_targets'        => [],
-      'separate_postgres_targets'    => [],
-      'all_additional_agent_targets' => [agent],
-      'manage_postgres'              => true,
-      'postgres_hosts'               => [],
     }
   end
 
   let(:s_target_map) do
     {
-      'primary_target'               => primary,
       'server_targets'               => [primary],
       'compiler_targets'             => [],
       'compiler_lb_targets'          => [],
       'ovdb_targets'                 => [primary],
       'ovdb_lb_targets'              => [],
       'postgres_targets'             => [primary],
+      'unmanaged_postgres_hosts'   => [],
       'agent_targets'                => [agent],
-      'separate_ovdb_targets'        => [],
-      'separate_postgres_targets'    => [],
-      'all_additional_agent_targets' => [agent],
-      'manage_postgres'              => true,
-      'postgres_hosts'               => [primary.to_s],
     }
   end
 
   let(:m_target_map) do
     {
-      'primary_target'               => primary,
       'server_targets'               => [primary],
       'compiler_targets'             => [compiler1, compiler2],
       'compiler_lb_targets'          => [clb],
       'ovdb_targets'                 => [primary],
       'ovdb_lb_targets'              => [],
       'postgres_targets'             => [primary],
+      'unmanaged_postgres_hosts'   => [],
       'agent_targets'                => [agent],
-      'separate_ovdb_targets'        => [],
-      'separate_postgres_targets'    => [],
-      'all_additional_agent_targets' => [agent, clb],
-      'manage_postgres'              => true,
-      'postgres_hosts'               => [primary.to_s],
     }
   end
 
   let(:l_target_map) do
     {
-      'primary_target'               => primary,
       'server_targets'               => [primary],
       'compiler_targets'             => [compiler1, compiler2],
       'compiler_lb_targets'          => [clb],
       'ovdb_targets'                 => [primary],
       'ovdb_lb_targets'              => [],
       'postgres_targets'             => [postgres],
+      'unmanaged_postgres_hosts'   => [],
       'agent_targets'                => [agent],
-      'separate_ovdb_targets'        => [],
-      'separate_postgres_targets'    => [postgres],
-      'all_additional_agent_targets' => [agent, clb, postgres],
-      'manage_postgres'              => true,
-      'postgres_hosts'               => [postgres.to_s],
     }
   end
 
   let(:h_target_map) do
     {
-      'primary_target'               => primary,
       'server_targets'               => [primary],
       'compiler_targets'             => [compiler1, compiler2],
       'compiler_lb_targets'          => [clb],
       'ovdb_targets'                 => [ovdb1, ovdb2],
       'ovdb_lb_targets'              => [ovdblb],
       'postgres_targets'             => [postgres],
+      'unmanaged_postgres_hosts'   => [],
       'agent_targets'                => [agent],
-      'separate_ovdb_targets'        => [ovdb1, ovdb2],
-      'separate_postgres_targets'    => [postgres],
-      'all_additional_agent_targets' => [agent, clb, ovdblb, postgres],
-      'manage_postgres'              => true,
-      'postgres_hosts'               => [postgres.to_s],
     }
   end
 
@@ -115,10 +92,24 @@ RSpec.shared_context('shared target maps') do
     }
   end
 
+  let(:s_params) do
+    {
+      'primary_host'          => primary.to_s,
+      'ovdb_hosts'            => [primary.to_s],
+      'postgres_hosts'        => [primary.to_s],
+      'compiler_hosts'        => [],
+      'compiler_lb_hosts'     => [],
+      'ovdb_lb_hosts'         => [],
+      'agent_hosts'           => [agent.to_s],
+      'manage_postgres'       => true,
+      'compiler_pool_address' => nil,
+      'ovdb_pool_address'     => nil,
+    }
+  end
+
   def unmanaged_postgres(target_map)
-    target_map['manage_postgres'] = false
+    target_map['unmanaged_postgres_hosts'] = target_map['postgres_targets'].map(&:to_s)
     target_map['postgres_targets'] = []
-    target_map['separate_postgres_targets'] = []
     target_map
   end
 end

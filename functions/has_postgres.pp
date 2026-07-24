@@ -5,5 +5,6 @@
 function ovox::has_postgres(
   Ovox::TargetMap $target_map
 ) >> Boolean {
-  (!$target_map['postgres_hosts'].empty())
+  !($target_map['postgres_targets'].empty() and
+    $target_map['unmanaged_postgres_hosts'].empty())
 }

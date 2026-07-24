@@ -8,10 +8,9 @@
 function ovox::has_separate_postgres(
   Ovox::TargetMap $target_map
 ) >> Boolean {
-  # Either we are explicitly managing a separate postgres node,
-  (! $target_map['separate_postgres_targets'].empty()) or
-  # We have a reference to an unmanaged postgres host somewhere in
+  # Either we are explicitly managing a separate postgres node(s),
+  (! ovox::separate_postgres_targets($target_map).empty()) or
+  # We have a reference to an unmanaged postgres host(s) somewhere in
   # the cloud to configure against.
-    (! $target_map['manage_postgres'] and
-     ! $target_map['postgres_hosts'].empty())
+    (! $target_map['unmanaged_postgres_hosts'].empty())
 }

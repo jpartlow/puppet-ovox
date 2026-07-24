@@ -5,5 +5,5 @@
 function ovox::has_separate_ovdbs(
   Ovox::TargetMap $target_map
 ) >> Boolean {
-  ! $target_map['separate_ovdb_targets'].empty()
+  ! ovox::separate_ovdb_targets($target_map).empty()
 }
