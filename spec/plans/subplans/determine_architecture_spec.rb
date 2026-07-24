@@ -2,117 +2,138 @@ require 'spec_helper'
 
 describe 'plan: ovox::subplans::determine_architecture' do
   include_context 'plan_init'
+
+  RSpec.shared_examples('run arch plan') do
+    it 'returns a target map' do
+      result = run_plan('ovox::subplans::determine_architecture', params)
+
+      expect(result.ok?).to(eq(true), result.value.to_s)
+      expect(result.value).to eq(target_map)
+    end
+  end
+
   include_context 'shared target maps'
 
   context 'tiny' do
     let(:params) { t_params }
-
-    it 'returns an arch map' do
-      result = run_plan('ovox::subplans::determine_architecture', params)
-
-      expect(result.ok?).to(eq(true), result.value.to_s)
-      arch_map = result.value
-      expect(arch_map.keys).to(
-        eq(['architecture', 'target_map', 'role_map', 'profile_flags'])
-      )
-      expect(arch_map['architecture']).to eq('tiny')
-      expect(arch_map['target_map']).to eq(
-        {
-          'primary_target'               => primary,
-          'server_targets'               => [primary],
-          'ovdb_targets'                 => [],
-          'postgres_targets'             => [],
-          'compiler_targets'             => [],
-          'compiler_lb_targets'          => [],
-          'ovdb_lb_targets'              => [],
-          'separate_ovdb_targets'        => [],
-          'separate_postgres_targets'    => [],
-          'agent_targets'                => [agent],
-          'all_additional_agent_targets' => [agent],
-          'manage_postgres'              => true,
-          'postgres_hosts'               => [],
-        }
-      )
-      expect(arch_map['role_map']).to match(
-        {
-          'primary'     => [primary],
-          'ovdb'        => [],
-          'postgres'    => [],
-          'compiler'    => [],
-          'compiler_lb' => [],
-          'ovdb_lb'     => [],
-        }
-      )
-      expect(arch_map['profile_flags']).to match(
-        {
-          'ov_role::primary::openvox_server' => true,
-        }
-      )
+    let(:target_map) do
+      {
+        'server_targets'           => [primary],
+        'ovdb_targets'             => [],
+        'postgres_targets'         => [],
+        'compiler_targets'         => [],
+        'compiler_lb_targets'      => [],
+        'ovdb_lb_targets'          => [],
+        'agent_targets'            => [agent],
+        'unmanaged_postgres_hosts' => [],
+        'compiler_pool_address'    => nil,
+        'ovdb_pool_address'        => nil,
+      }
     end
+
+    include_examples('run arch plan')
   end
 
   context 'small' do
     let(:params) { s_params }
-
-    it 'returns an arch map' do
-      result = run_plan('ovox::subplans::determine_architecture', params)
-
-      expect(result.ok?).to(eq(true), result.value.to_s)
-      arch_map = result.value
-      expect(arch_map.keys).to(
-        eq(['architecture', 'target_map', 'role_map', 'profile_flags'])
-      )
-      expect(arch_map['architecture']).to eq('small')
-      expect(arch_map['target_map']).to eq(
-        {
-          'primary_target'               => primary,
-          'server_targets'               => [primary],
-          'ovdb_targets'                 => [primary],
-          'postgres_targets'             => [primary],
-          'compiler_targets'             => [],
-          'compiler_lb_targets'          => [],
-          'ovdb_lb_targets'              => [],
-          'separate_ovdb_targets'        => [],
-          'separate_postgres_targets'    => [],
-          'agent_targets'                => [agent],
-          'all_additional_agent_targets' => [agent],
-          'manage_postgres'              => true,
-          'postgres_hosts'               => [primary.to_s],
-        }
-      )
-      expect(arch_map['role_map']).to match(
-        {
-          'primary'     => [primary],
-          'ovdb'        => [],
-          'postgres'    => [],
-          'compiler'    => [],
-          'compiler_lb' => [],
-          'ovdb_lb'     => [],
-        }
-      )
-      expect(arch_map['profile_flags']).to match(
-        {
-          'ov_role::primary::install_server'   => true,
-          'ov_role::primary::install_ovdb'     => true,
-          'ov_role::primary::install_postgres' => true,
-        }
-      )
+    let(:target_map) do
+      {
+        'server_targets'           => [primary],
+        'ovdb_targets'             => [primary],
+        'postgres_targets'         => [primary],
+        'compiler_targets'         => [],
+        'compiler_lb_targets'      => [],
+        'ovdb_lb_targets'          => [],
+        'agent_targets'            => [agent],
+        'unmanaged_postgres_hosts' => [],
+        'compiler_pool_address'    => nil,
+        'ovdb_pool_address'        => nil,
+      }
     end
+
+    include_examples('run arch plan')
   end
 
   context 'medium' do
-    it 'returns an arch_map'
+    let(:params) { m_params }
+    let(:target_map) do
+      {
+        'server_targets'           => [primary],
+        'ovdb_targets'             => [primary],
+        'postgres_targets'         => [primary],
+        'compiler_targets'         => [compiler1, compiler2],
+        'compiler_lb_targets'      => [clb],
+        'ovdb_lb_targets'          => [],
+        'agent_targets'            => [agent],
+        'unmanaged_postgres_hosts' => [],
+        'compiler_pool_address'    => nil,
+        'ovdb_pool_address'        => nil,
+      }
+    end
+
+    include_examples('run arch plan')
   end
 
   context 'large' do
-    it 'returns an arch_map'
+    let(:params) { l_params }
+    let(:target_map) do
+      {
+        'server_targets'           => [primary],
+        'ovdb_targets'             => [primary],
+        'postgres_targets'         => [postgres],
+        'compiler_targets'         => [compiler1, compiler2],
+        'compiler_lb_targets'      => [clb],
+        'ovdb_lb_targets'          => [],
+        'agent_targets'            => [agent],
+        'unmanaged_postgres_hosts' => [],
+        'compiler_pool_address'    => nil,
+        'ovdb_pool_address'        => nil,
+      }
+    end
+
+    include_examples('run arch plan')
   end
 
   context 'huge' do
-    it 'returns an arch_map'
+    let(:params) { h_params }
+    let(:target_map) do
+      {
+        'server_targets'           => [primary],
+        'ovdb_targets'             => [ovdb1, ovdb2],
+        'postgres_targets'         => [postgres],
+        'compiler_targets'         => [compiler1, compiler2],
+        'compiler_lb_targets'      => [clb],
+        'ovdb_lb_targets'          => [ovdblb],
+        'agent_targets'            => [agent],
+        'unmanaged_postgres_hosts' => [],
+        'compiler_pool_address'    => nil,
+        'ovdb_pool_address'        => nil,
+      }
+    end
+
+    include_examples('run arch plan')
   end
 
   context 'custom' do
-    it 'returns an arch_map with ovdb and postgres on a separate node'
+    let(:params) do
+      l_params['ovdb_hosts'] = [postgres.to_s]
+      l_params
+    end
+    let(:target_map) do
+      {
+        'server_targets'           => [primary],
+        'ovdb_targets'             => [postgres],
+        'postgres_targets'         => [postgres],
+        'compiler_targets'         => [compiler1, compiler2],
+        'compiler_lb_targets'      => [clb],
+        'ovdb_lb_targets'          => [],
+        'agent_targets'            => [agent],
+        'unmanaged_postgres_hosts' => [],
+        'compiler_pool_address'    => nil,
+        'ovdb_pool_address'        => nil,
+      }
+    end
+
+    include_examples('run arch plan')
   end
 end

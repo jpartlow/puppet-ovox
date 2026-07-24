@@ -107,6 +107,51 @@ RSpec.shared_context('shared target maps') do
     }
   end
 
+  let(:m_params) do
+    {
+      'primary_host'          => primary.to_s,
+      'ovdb_hosts'            => [primary.to_s],
+      'postgres_hosts'        => [primary.to_s],
+      'compiler_hosts'        => [compiler1.to_s, compiler2.to_s ],
+      'compiler_lb_hosts'     => [clb.to_s],
+      'ovdb_lb_hosts'         => [],
+      'agent_hosts'           => [agent.to_s],
+      'manage_postgres'       => true,
+      'compiler_pool_address' => nil,
+      'ovdb_pool_address'     => nil,
+    }
+  end
+
+  let(:l_params) do
+    {
+      'primary_host'          => primary.to_s,
+      'ovdb_hosts'            => [primary.to_s],
+      'postgres_hosts'        => [postgres.to_s],
+      'compiler_hosts'        => [compiler1.to_s, compiler2.to_s ],
+      'compiler_lb_hosts'     => [clb.to_s],
+      'ovdb_lb_hosts'         => [],
+      'agent_hosts'           => [agent.to_s],
+      'manage_postgres'       => true,
+      'compiler_pool_address' => nil,
+      'ovdb_pool_address'     => nil,
+    }
+  end
+
+  let(:h_params) do
+    {
+      'primary_host'          => primary.to_s,
+      'ovdb_hosts'            => [ovdb1.to_s, ovdb2.to_s],
+      'postgres_hosts'        => [postgres.to_s],
+      'compiler_hosts'        => [compiler1.to_s, compiler2.to_s ],
+      'compiler_lb_hosts'     => [clb.to_s],
+      'ovdb_lb_hosts'         => [ovdblb.to_s],
+      'agent_hosts'           => [agent.to_s],
+      'manage_postgres'       => true,
+      'compiler_pool_address' => nil,
+      'ovdb_pool_address'     => nil,
+    }
+  end
+
   def unmanaged_postgres(target_map)
     target_map['unmanaged_postgres_hosts'] = target_map['postgres_targets'].map(&:to_s)
     target_map['postgres_targets'] = []
