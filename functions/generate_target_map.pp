@@ -22,6 +22,8 @@ function ovox::generate_target_map(
   $compiler_lb_targets = get_targets($host_map['compiler_lb_hosts'])
   $ovdb_targets        = get_targets($host_map['ovdb_hosts'])
   $ovdb_lb_targets     = get_targets($host_map['ovdb_lb_hosts'])
+  $agent_targets       = get_targets($host_map['agent_hosts'])
+
   if $manage_postgres {
     $postgres_targets = get_targets($host_map['postgres_hosts'])
     $unmanaged_postgres_hosts = []
@@ -30,7 +32,6 @@ function ovox::generate_target_map(
     $unmanaged_postgres_hosts =
       Array($host_map['postgres_hosts'], true)
   }
-  $agent_targets       = get_targets($host_map['agent_hosts'])
 
   $target_map = {
     'server_targets'           => $server_targets,
@@ -41,6 +42,8 @@ function ovox::generate_target_map(
     'postgres_targets'         => $postgres_targets,
     'unmanaged_postgres_hosts' => $unmanaged_postgres_hosts,
     'agent_targets'            => $agent_targets,
+    'compiler_pool_address'    => $host_map['compiler_pool_address'],
+    'ovdb_pool_address'        => $host_map['ovdb_pool_address'],
   }
 
   $target_map

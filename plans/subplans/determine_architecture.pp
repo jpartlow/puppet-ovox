@@ -1,9 +1,11 @@
-# Determine architecture, role mappings and configuration from given
-# host targets and return a hash of information for the caller.
-#
-# May raise warnings and pause for confirmation.
+# Given cluster host information, validate the architecture and
+# return an Ovox::TargetMap structure with Target arrays
+# and host configuration info for the rest of the plan to work
+# with.
 #
 # May raise errors for invalid configurations.
+#
+# TODO: May raise warnings and pause for confirmation.
 plan ovox::subplans::determine_architecture(
   TargetSpec $primary_host,
   TargetSpec $ovdb_hosts,
@@ -19,13 +21,15 @@ plan ovox::subplans::determine_architecture(
 
   $target_map = ovox::generate_target_map(
     {
-      'primary_host'      => $primary_host,
-      'ovdb_hosts'        => $ovdb_hosts,
-      'postgres_hosts'    => $postgres_hosts,
-      'compiler_hosts'    => $compiler_hosts,
-      'compiler_lb_hosts' => $compiler_lb_hosts,
-      'ovdb_lb_hosts'     => $ovdb_lb_hosts,
-      'agent_hosts'       => $agent_hosts,
+      'primary_host'          => $primary_host,
+      'ovdb_hosts'            => $ovdb_hosts,
+      'postgres_hosts'        => $postgres_hosts,
+      'compiler_hosts'        => $compiler_hosts,
+      'compiler_lb_hosts'     => $compiler_lb_hosts,
+      'ovdb_lb_hosts'         => $ovdb_lb_hosts,
+      'agent_hosts'           => $agent_hosts,
+      'compiler_pool_address' => $compiler_pool_address,
+      'ovdb_pool_address'     => $ovdb_pool_address,
     },
     $manage_postgres,
   )

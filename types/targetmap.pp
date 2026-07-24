@@ -1,4 +1,5 @@
 # This structure provides a consistent mapping of Target arrays
+# and a few hostname references for an OpenVox service cluster
 # as returned by the ovox::generate_target_map() function.
 #
 # It allows a host of other small functions to return consistent
@@ -36,6 +37,13 @@
 #   The ovox::get_target_map() function will not return a TargetMap
 #   with both $postgres_targets and $unmanaged_postgres_targets. A
 #   TargetMap in such a state is an error.
+# - compiler_pool_address: the hostname agents should use to reach
+#   compiler services. Calculated from compiler_lb_targets (hostname
+#   of first entry) if not given.
+# - ovdb_pool_address: the hostname openvox-servers in the cluster
+#   should use to reach openvoxdb if ovdb_targets is greater than one.
+#   Calculated from ovdb_lb_targets (hostname of first entry) if not
+#   given.
 type Ovox::TargetMap = Struct[{
   server_targets           => Array[Target,1,1],
   ovdb_targets             => Array[Target],
@@ -45,4 +53,6 @@ type Ovox::TargetMap = Struct[{
   compiler_lb_targets      => Array[Target],
   agent_targets            => Array[Target],
   unmanaged_postgres_hosts => BoltLib::TargetSpec,
+  compiler_pool_address    => Optional[String[1]],
+  ovdb_pool_address        => Optional[String[1]],
 }]

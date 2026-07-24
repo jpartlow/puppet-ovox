@@ -24,24 +24,28 @@ describe 'ovox::generate_target_map' do
   end
   let(:m_host_map) do
     {
-      'primary_host'      => 'primary.spec',
-      'ovdb_hosts'        => 'primary.spec',
-      'postgres_hosts'    => 'primary.spec',
-      'compiler_hosts'    => ['compiler1.spec', 'compiler2.spec'],
-      'compiler_lb_hosts' => ['clb.spec'],
-      'ovdb_lb_hosts'     => [],
-      'agent_hosts'       => 'agent.spec',
+      'primary_host'          => 'primary.spec',
+      'ovdb_hosts'            => 'primary.spec',
+      'postgres_hosts'        => 'primary.spec',
+      'compiler_hosts'        => ['compiler1.spec', 'compiler2.spec'],
+      'compiler_lb_hosts'     => ['clb.spec'],
+      'ovdb_lb_hosts'         => [],
+      'agent_hosts'           => 'agent.spec',
+      'compiler_pool_address' => nil,
+      'ovdb_pool_address'     => nil,
     }
   end
   let(:h_host_map) do
     {
-      'primary_host'      => 'primary.spec',
-      'ovdb_hosts'        => ['ovdb1.spec', 'ovdb2.spec'],
-      'postgres_hosts'    => 'cloud.postgres.spec',
-      'compiler_hosts'    => ['compiler1.spec', 'compiler2.spec'],
-      'compiler_lb_hosts' => ['clb.spec'],
-      'ovdb_lb_hosts'     => ['ovdblb.spec'],
-      'agent_hosts'       => 'agent.spec',
+      'primary_host'          => 'primary.spec',
+      'ovdb_hosts'            => ['ovdb1.spec', 'ovdb2.spec'],
+      'postgres_hosts'        => 'cloud.postgres.spec',
+      'compiler_hosts'        => ['compiler1.spec', 'compiler2.spec'],
+      'compiler_lb_hosts'     => ['clb.spec'],
+      'ovdb_lb_hosts'         => ['ovdblb.spec'],
+      'agent_hosts'           => 'agent.spec',
+      'compiler_pool_address' => 'c.lb.spec',
+      'ovdb_pool_address'     => 'o.lb.spec',
     }
   end
 
@@ -61,6 +65,8 @@ describe 'ovox::generate_target_map' do
           'postgres_targets'         => [a_target('primary.spec')],
           'agent_targets'            => [a_target('agent.spec')],
           'unmanaged_postgres_hosts' => [],
+          'compiler_pool_address'    => nil,
+          'ovdb_pool_address'        => nil,
         }
       )
     end
@@ -85,6 +91,8 @@ describe 'ovox::generate_target_map' do
           'postgres_targets'         => [],
           'agent_targets'            => [a_target('agent.spec')],
           'unmanaged_postgres_hosts' => ['cloud.postgres.spec'],
+          'compiler_pool_address' => 'c.lb.spec',
+          'ovdb_pool_address'     => 'o.lb.spec',
         }
       )
     end
@@ -103,6 +111,8 @@ describe 'ovox::generate_target_map' do
           'postgres_targets'         => [],
           'agent_targets'            => [a_target('agent.spec')],
           'unmanaged_postgres_hosts' => [],
+          'compiler_pool_address'    => nil,
+          'ovdb_pool_address'        => nil,
         }
       )
     end
