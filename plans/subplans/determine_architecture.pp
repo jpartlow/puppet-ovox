@@ -87,14 +87,7 @@ plan ovox::subplans::determine_architecture(
 
   # Maps the OpenVox ov_role classes to the distinct set of targets
   # they will be classifying in the configuration phase.
-  $role_map = {
-    'primary'     => $target_map['server_targets'],
-    'ovdb'        => $target_map['separate_ovdb_targets'],
-    'postgres'    => $target_map['separate_postgres_targets'],
-    'compiler'    => $target_map['compiler_targets'],
-    'compiler_lb' => $target_map['compiler_lb_targets'],
-    'ovdb_lb'     => $target_map['ovdb_lb_targets'],
-  }
+  $role_map = ovox::derive_role_map($target_map)
 
   # Check for invalid role intersections.
   $role_intersection_errors = [
