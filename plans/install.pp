@@ -120,7 +120,7 @@ plan ovox::install(
   # ???
 ) {
 
-  $arch_map = run_plan('ovox::subplans::determine_architecture',
+  $target_map = run_plan('ovox::subplans::validate_architecture',
     'primary_host'          => $primary_host,
     'ovdb_hosts'            => $ovdb_hosts,
     'postgres_hosts'        => $postgres_hosts,

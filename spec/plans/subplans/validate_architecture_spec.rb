@@ -1,11 +1,13 @@
 require 'spec_helper'
 
-describe 'plan: ovox::subplans::determine_architecture' do
+describe 'plan: ovox::subplans::validate_architecture' do
   include_context 'plan_init'
 
   RSpec.shared_examples('run arch plan') do
     it 'returns a target map' do
-      result = run_plan('ovox::subplans::determine_architecture', params)
+      expect_out_message
+
+      result = run_plan('ovox::subplans::validate_architecture', params)
 
       expect(result.ok?).to(eq(true), result.value.to_s)
       expect(result.value).to eq(target_map)

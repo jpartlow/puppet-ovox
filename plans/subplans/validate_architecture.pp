@@ -6,7 +6,7 @@
 # May raise errors for invalid configurations.
 #
 # TODO: May raise warnings and pause for confirmation.
-plan ovox::subplans::determine_architecture(
+plan ovox::subplans::validate_architecture(
   TargetSpec $primary_host,
   TargetSpec $ovdb_hosts,
   TargetSpec $postgres_hosts,
@@ -33,6 +33,9 @@ plan ovox::subplans::determine_architecture(
     },
     $manage_postgres,
   )
+
+  $architecture = ovox::get_architecture($target_map)
+  out::message("Architecture: ${architecture}")
 
   $errors = ovox::validate_architecture($target_map)
 
