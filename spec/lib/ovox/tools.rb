@@ -6,7 +6,7 @@ module Ovox
 
     def a_target(name)
       Bolt::Target.from_hash(
-        { 'name' => name },
+        { 'uri' => name },
         inventory
       )
     end
