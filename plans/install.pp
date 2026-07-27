@@ -141,32 +141,23 @@ plan ovox::install(
   # allow re-running.
 
   # Install openvox packages
-  run_plan('ovox::subplans::install_openvox',
-    'openvox_agent_targets'    => $all_additional_agents,
-    'openvox_server_targets'   => $server_targets,
-    'openvox_compiler_targets' => $compiler_targets,
-    'openvox_db_targets'       => $ovdb_targets,
-    'openvox_agent_params'     => $agent_ver_params,
-    'openvox_server_params'    => $server_ver_params,
-    'openvox_compiler_params'  => $compiler_ver_params,
-    'openvox_db_params'        => $server_ver_params,
-    'install_defaults'         => $install_defaults,
-    'install_termini'          => $install_termini,
+  $version_map = run_plan('ovox::subplans::install_openvox',
+    'target_map'              => $target_map,
+    'openvox_agent_params'    => $agent_ver_params,
+    'openvox_server_params'   => $server_ver_params,
+    'openvox_compiler_params' => $compiler_ver_params,
+    'openvox_db_params'       => $ovdb_ver_params,
+    'install_defaults'        => $install_defaults,
+    'install_termini'         => $install_termini,
   )
+  out::message("Installed versions: ${stdlib::to_json_pretty($version_map)}")
 
   # Configure openvox services/Install PostgreSQL
-  run_plan('ovox::configure',
-    'server_targets'       => $server_targets,
-    'compiler_targets'     => $compiler_targets,
-    'compiler_lb_targets'  => $compiler_lb_targets,
-    'ovdb_targets'         => $ovdb_targets,
-    'ovdb_lb_targets'      => $ovdb_lb_targets,
+  run_plan('ovox::subplans::configure',
+    'target_map'           => $target_map,
     'manage_postgres'      => $manage_postgres,
-    'postgres_targets'     => $postgres_targets,
     'postgres_version'     => $postgres_version,
     'postgres_credentials' => $postgres_credentials,
-    'postgres_host'        => $postgres_host,
-    'agent_targets'        => $agent_targets,
     'dns_alt_names'        => $dns_alt_names,
   )
 

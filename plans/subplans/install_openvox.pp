@@ -13,12 +13,7 @@
 # NOTE: The openvoxdb-termini package will be installed on all server
 # targets by default. Set $install_termini to false to skip this.
 #
-# @param openvox_agent_targets The targets to install the OpenVox
-#   Puppet agent on.
-# @param openvox_server_targets The target to install the OpenVox
-#   Puppet server on.
-# @param openvox_db_targets The target to install the OpenVox PuppetDB
-#   on.
+# @param target_map An Ovox::TargetMap for the cluster.
 # @param openvox_agent_params The set of
 #   Ovox::Openvox_install_params defining source
 #   and version for the openvox-agent package to install on all
@@ -40,10 +35,7 @@
 #   automated pipelines. If undef (default), the file will not
 #   be written.
 plan ovox::subplans::install_openvox(
-  TargetSpec $openvox_agent_targets,
-  TargetSpec $openvox_server_targets = [],
-  TargetSpec $openvox_compiler_targets = [],
-  TargetSpec $openvox_db_targets = [],
+  Ovox::TargetMap $target_map,
   Ovox::Openvox_install_params
     $openvox_agent_params = {},
   Ovox::Openvox_install_params
@@ -63,16 +55,23 @@ plan ovox::subplans::install_openvox(
 ) {
   # Resolve targets in case we were given hostname or inventory group
   # name references instead of Target objects.
-  $agent_targets    = get_targets($openvox_agent_targets)
-  $server_targets   = get_targets($openvox_server_targets)
-  $compiler_targets = get_targets($openvox_compiler_targets)
-  $all_server_targets = [$server_targets, $compiler_targets].flatten().unique()
-  $db_targets       = get_targets($openvox_db_targets)
-  $db_termini_targets = $install_termini ? {
+  $agent_targets    = $target_map['agent_targets']
+  $server_targets   = $target_map['server_targets']
+  $compiler_targets = $target_map['compiler_targets']
+  $all_server_targets = ($server_targets + $compiler_targets).unique()
+  $ovdb_targets       = $target_map['ovdb_targets']
+  $ovdb_termini_targets = $install_termini ? {
     true    => $all_server_targets,
     default => [],
   }
-  $all_targets    = [$agent_targets, $all_server_targets, $db_targets].flatten().unique()
+  $all_targets    = [
+    $agent_targets,
+    $all_server_targets,
+    $ovdb_targets,
+    $target_map['postgres_targets'],
+    $target_map['compiler_lb_targets'],
+    $target_map['ovdb_lb_targets'],
+  ].flatten().unique()
 
   $agent_version_results = run_plan(
     'ovox::subplans::install_component',
@@ -99,8 +98,8 @@ plan ovox::subplans::install_openvox(
     # $openvox_server_params == $openvox_compiler_params...
     [$server_targets, 'openvox-server', $openvox_server_params],
     [$compiler_targets, 'openvox-server', $openvox_compiler_params],
-    [$db_targets, 'openvoxdb', $openvox_db_params],
-    [$db_termini_targets, 'openvoxdb-termini', $openvox_db_params],
+    [$ovdb_targets, 'openvoxdb', $openvox_db_params],
+    [$ovdb_termini_targets, 'openvoxdb-termini', $openvox_db_params],
   ]
   $version_map = $server_installations.reduce($agent_version_map) |$map, $i| {
     $targets = $i[0]

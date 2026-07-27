@@ -13,66 +13,80 @@ RSpec.shared_context('shared target maps') do
   # architecture.
   let(:t_target_map) do
     {
-      'server_targets'               => [primary],
-      'compiler_targets'             => [],
-      'compiler_lb_targets'          => [],
-      'ovdb_targets'                 => [],
-      'ovdb_lb_targets'              => [],
-      'postgres_targets'             => [],
-      'unmanaged_postgres_hosts'   => [],
-      'agent_targets'                => [agent],
+      'server_targets'           => [primary],
+      'compiler_targets'         => [],
+      'compiler_lb_targets'      => [],
+      'ovdb_targets'             => [],
+      'ovdb_lb_targets'          => [],
+      'postgres_targets'         => [],
+      'unmanaged_postgres_hosts' => [],
+      'agent_targets'            => [agent],
     }
   end
 
   let(:s_target_map) do
     {
-      'server_targets'               => [primary],
-      'compiler_targets'             => [],
-      'compiler_lb_targets'          => [],
-      'ovdb_targets'                 => [primary],
-      'ovdb_lb_targets'              => [],
-      'postgres_targets'             => [primary],
-      'unmanaged_postgres_hosts'   => [],
-      'agent_targets'                => [agent],
+      'server_targets'           => [primary],
+      'compiler_targets'         => [],
+      'compiler_lb_targets'      => [],
+      'ovdb_targets'             => [primary],
+      'ovdb_lb_targets'          => [],
+      'postgres_targets'         => [primary],
+      'unmanaged_postgres_hosts' => [],
+      'agent_targets'            => [agent],
     }
   end
 
   let(:m_target_map) do
     {
-      'server_targets'               => [primary],
-      'compiler_targets'             => [compiler1, compiler2],
-      'compiler_lb_targets'          => [clb],
-      'ovdb_targets'                 => [primary],
-      'ovdb_lb_targets'              => [],
-      'postgres_targets'             => [primary],
-      'unmanaged_postgres_hosts'   => [],
-      'agent_targets'                => [agent],
+      'server_targets'           => [primary],
+      'compiler_targets'         => [compiler1, compiler2],
+      'compiler_lb_targets'      => [clb],
+      'ovdb_targets'             => [primary],
+      'ovdb_lb_targets'          => [],
+      'postgres_targets'         => [primary],
+      'unmanaged_postgres_hosts' => [],
+      'agent_targets'            => [agent],
     }
   end
 
   let(:l_target_map) do
     {
-      'server_targets'               => [primary],
-      'compiler_targets'             => [compiler1, compiler2],
-      'compiler_lb_targets'          => [clb],
-      'ovdb_targets'                 => [primary],
-      'ovdb_lb_targets'              => [],
-      'postgres_targets'             => [postgres],
-      'unmanaged_postgres_hosts'   => [],
-      'agent_targets'                => [agent],
+      'server_targets'           => [primary],
+      'compiler_targets'         => [compiler1, compiler2],
+      'compiler_lb_targets'      => [clb],
+      'ovdb_targets'             => [primary],
+      'ovdb_lb_targets'          => [],
+      'postgres_targets'         => [postgres],
+      'unmanaged_postgres_hosts' => [],
+      'agent_targets'            => [agent],
     }
   end
 
   let(:h_target_map) do
     {
-      'server_targets'               => [primary],
-      'compiler_targets'             => [compiler1, compiler2],
-      'compiler_lb_targets'          => [clb],
-      'ovdb_targets'                 => [ovdb1, ovdb2],
-      'ovdb_lb_targets'              => [ovdblb],
-      'postgres_targets'             => [postgres],
-      'unmanaged_postgres_hosts'   => [],
-      'agent_targets'                => [agent],
+      'server_targets'           => [primary],
+      'compiler_targets'         => [compiler1, compiler2],
+      'compiler_lb_targets'      => [clb],
+      'ovdb_targets'             => [ovdb1, ovdb2],
+      'ovdb_lb_targets'          => [ovdblb],
+      'postgres_targets'         => [postgres],
+      'unmanaged_postgres_hosts' => [],
+      'agent_targets'            => [agent],
+    }
+  end
+
+  # Variations
+  let(:just_agents_target_map) do
+    {
+      'server_targets'           => [],
+      'compiler_targets'         => [],
+      'compiler_lb_targets'      => [],
+      'ovdb_targets'             => [],
+      'ovdb_lb_targets'          => [],
+      'postgres_targets'         => [],
+      'unmanaged_postgres_hosts' => [],
+      'agent_targets'            => [agent],
     }
   end
 

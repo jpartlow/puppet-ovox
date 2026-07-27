@@ -2,11 +2,12 @@ require 'spec_helper'
 
 describe 'plan: ovox::subplans::install_openvox' do
   include_context 'plan_init'
+  include_context('shared target maps')
 
-  let(:all_targets) { [ a_target('agent-1.rspec') ] }
+  let(:all_targets) { [ agent ] }
   let(:params) do
     {
-      'openvox_agent_targets' => all_targets,
+      'target_map' => just_agents_target_map,
     }
   end
 
@@ -40,7 +41,7 @@ describe 'plan: ovox::subplans::install_openvox' do
 
     version_map = result.value
     expect(version_map).to eq({
-      'agent-1.rspec' => {
+      'agent.spec' => {
         'openvox-agent' => '8.0.0',
       }
     })
@@ -110,14 +111,12 @@ describe 'plan: ovox::subplans::install_openvox' do
   end
 
   context 'with primary targets' do
-    let(:agent_targets) { [ a_target('agent-1.rspec') ] }
-    let(:primary_targets) { [ a_target('primary-1.rspec') ] }
+    let(:agent_targets) { [ agent ] }
+    let(:primary_targets) { [ primary ] }
     let(:all_targets) { agent_targets + primary_targets }
     let(:params) do
       {
-        'openvox_agent_targets'  => agent_targets,
-        'openvox_server_targets' => primary_targets,
-        'openvox_db_targets'     => primary_targets,
+        'target_map' => s_target_map,
       }
     end
 
@@ -208,10 +207,10 @@ describe 'plan: ovox::subplans::install_openvox' do
 
       version_map = result.value
       expect(version_map).to eq({
-        'agent-1.rspec' => {
+        'agent.spec' => {
           'openvox-agent' => '8.0.0',
         },
-        'primary-1.rspec' => {
+        'primary.spec' => {
           'openvox-agent'     => '8.0.0',
           'openvox-server'    => '8.1.0',
           'openvoxdb'         => '8.2.0',
@@ -277,8 +276,7 @@ describe 'plan: ovox::subplans::install_openvox' do
     context 'with agent and server targets' do
       let(:params) do
         {
-          'openvox_agent_targets'  => agent_targets,
-          'openvox_server_targets' => primary_targets,
+          'target_map' => t_target_map,
           'openvox_server_params' => {
             'openvox_version'  => '8.1.0',
           },
@@ -333,10 +331,10 @@ describe 'plan: ovox::subplans::install_openvox' do
 
         version_map = result.value
         expect(version_map).to eq({
-          'agent-1.rspec' => {
+          'agent.spec' => {
             'openvox-agent' => 'v',
           },
-          'primary-1.rspec' => {
+          'primary.spec' => {
             'openvox-agent'     => 'v',
             'openvox-server'    => 'v',
             'openvoxdb-termini' => 'v',
@@ -380,22 +378,34 @@ describe 'plan: ovox::subplans::install_openvox' do
       end
     end
 
-    context 'with different server and db targets' do
-      let(:server_targets) { [ a_target('server-1.rspec') ] }
-      let(:db_targets) { [ a_target('db-1.rspec') ] }
-      let(:all_targets) { agent_targets + server_targets + db_targets }
+    context 'for a huge arch with different server and db targets' do
+      let(:server_targets) { [ primary ] }
+      let(:compiler_targets) { [ compiler1, compiler2 ] }
+      let(:db_targets) { [ ovdb1, ovdb2 ] }
+      # This is unfortunately order dependent because
+      # expect_plan.with_params() is going to match the target array
+      # exactly...
+      let(:all_targets) do
+        agent_targets +
+          server_targets +
+          compiler_targets +
+          db_targets +
+          [
+            postgres,
+            clb,
+            ovdblb,
+          ]
+      end
       let(:params) do
         {
-          'openvox_agent_targets'  => agent_targets,
-          'openvox_server_targets' => server_targets,
-          'openvox_db_targets'     => db_targets,
+          'target_map' => h_target_map,
           'openvox_server_params' => {
             'openvox_version'  => '8.1.0',
           },
         }
       end
 
-      it 'installs to all three targets' do
+      it 'installs to all targets' do
         expect_task('openvox_bootstrap::install')
           .with_targets(all_targets)
           .with_params({
@@ -419,6 +429,17 @@ describe 'plan: ovox::subplans::install_openvox' do
             '_catch_errors' => true,
           })
         expect_task('openvox_bootstrap::install')
+          .with_targets(compiler_targets)
+          .with_params({
+            'package'    => 'openvox-server',
+            'version'    => 'latest',
+            'collection' => 'openvox8',
+            'apt_source' => 'https://apt.voxpupuli.org',
+            'yum_source' => 'https://yum.voxpupuli.org',
+            'stop_service' => false,
+            '_catch_errors' => true,
+          })
+        expect_task('openvox_bootstrap::install')
           .with_targets(db_targets)
           .with_params({
             'package'    => 'openvoxdb',
@@ -430,7 +451,7 @@ describe 'plan: ovox::subplans::install_openvox' do
             '_catch_errors' => true,
           })
         expect_task('openvox_bootstrap::install')
-          .with_targets(server_targets)
+          .with_targets(server_targets + compiler_targets)
           .with_params({
             'package'    => 'openvoxdb-termini',
             'version'    => 'latest',
@@ -440,7 +461,7 @@ describe 'plan: ovox::subplans::install_openvox' do
             'stop_service' => false,
             '_catch_errors' => true,
           })
-        expect_task('package').be_called_times(4)
+        expect_task('package').be_called_times(5)
           .always_return({
             'status' => 'installed',
             'version' => 'v',
@@ -451,17 +472,40 @@ describe 'plan: ovox::subplans::install_openvox' do
 
         version_map = result.value
         expect(version_map).to eq({
-          'agent-1.rspec' => {
+          'agent.spec' => {
             'openvox-agent' => 'v',
           },
-          'server-1.rspec' => {
+          'primary.spec' => {
             'openvox-agent'     => 'v',
             'openvox-server'    => 'v',
             'openvoxdb-termini' => 'v',
           },
-          'db-1.rspec' => {
+          'ovdb1.spec' => {
             'openvox-agent' => 'v',
             'openvoxdb'     => 'v',
+          },
+          'ovdb2.spec' => {
+            'openvox-agent' => 'v',
+            'openvoxdb'     => 'v',
+          },
+          'compiler1.spec' => {
+            'openvox-agent'     => 'v',
+            'openvox-server'    => 'v',
+            'openvoxdb-termini' => 'v',
+          },
+          'compiler2.spec' => {
+            'openvox-agent'     => 'v',
+            'openvox-server'    => 'v',
+            'openvoxdb-termini' => 'v',
+          },
+          'postgres.spec' => {
+            'openvox-agent' => 'v',
+          },
+          'clb.spec' => {
+            'openvox-agent' => 'v',
+          },
+          'ovdblb.spec' => {
+            'openvox-agent' => 'v',
           },
         })
       end
