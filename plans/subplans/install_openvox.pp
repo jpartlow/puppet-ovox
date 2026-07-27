@@ -64,14 +64,7 @@ plan ovox::subplans::install_openvox(
     true    => $all_server_targets,
     default => [],
   }
-  $all_targets    = [
-    $agent_targets,
-    $all_server_targets,
-    $ovdb_targets,
-    $target_map['postgres_targets'],
-    $target_map['compiler_lb_targets'],
-    $target_map['ovdb_lb_targets'],
-  ].flatten().unique()
+  $all_targets = ovox::all_agent_targets($target_map)
 
   $agent_version_results = run_plan(
     'ovox::subplans::install_component',

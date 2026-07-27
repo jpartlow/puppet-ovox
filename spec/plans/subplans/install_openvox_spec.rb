@@ -113,7 +113,7 @@ describe 'plan: ovox::subplans::install_openvox' do
   context 'with primary targets' do
     let(:agent_targets) { [ agent ] }
     let(:primary_targets) { [ primary ] }
-    let(:all_targets) { agent_targets + primary_targets }
+    let(:all_targets) { primary_targets + agent_targets }
     let(:params) do
       {
         'target_map' => s_target_map,
@@ -386,10 +386,10 @@ describe 'plan: ovox::subplans::install_openvox' do
       # expect_plan.with_params() is going to match the target array
       # exactly...
       let(:all_targets) do
-        agent_targets +
-          server_targets +
-          compiler_targets +
+        server_targets +
           db_targets +
+          compiler_targets +
+          agent_targets +
           [
             postgres,
             clb,
