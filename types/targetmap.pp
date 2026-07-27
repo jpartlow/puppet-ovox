@@ -7,10 +7,9 @@
 # for the rest of the plans to operate on.
 #
 # Keys:
-# - server_targets: An array of one Target object pointing to the
-#   cluster's primary host (openvox-server/ca). This is an array
-#   for consistency of handling, but must have one and only one
-#   target.
+# - server_targets: An array of up to one Target object pointing to
+#   the cluster's primary host (openvox-server/ca). This is an array
+#   for consistency of handling, but may have at most one target.
 # - ovdb_targets: An array of the openvoxdb host targets.
 # - ovdb_lb_targets: An array of any load-balancers for the
 #   openvoxdb hosts.
@@ -45,7 +44,7 @@
 #   Calculated from ovdb_lb_targets (hostname of first entry) if not
 #   given.
 type Ovox::TargetMap = Struct[{
-  server_targets           => Array[Target,1,1],
+  server_targets           => Array[Target,0,1],
   ovdb_targets             => Array[Target],
   ovdb_lb_targets          => Array[Target],
   postgres_targets         => Array[Target],

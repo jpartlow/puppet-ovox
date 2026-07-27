@@ -29,13 +29,17 @@ function ovox::validate_architecture(
   Ovox::TargetMap $target_map,
 ) >> Array[String[1]] {
 
-  $arch_errs = [
-    # The TargetMap type currently requires a single Target for
-    # 'server_targets' so this error shouldn't be possible.
+  # TODO: not doing anything with these yet. Need to change the
+  # returned structure, for one thing.
+  $arch_warnings = [
+    # Allow for just agent maps.
     [
       $target_map['server_targets'].empty(),
       'No defined primary openvox-server targets.',
     ],
+  ]
+
+  $arch_errs = [
     [
       (ovox::has_postgres($target_map) and
         $target_map['ovdb_targets'].empty()),
