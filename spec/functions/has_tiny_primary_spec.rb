@@ -25,7 +25,49 @@ describe 'ovox::has_tiny_primary' do
     is_expected.to run.with_params(l_target_map).and_return(false)
   end
 
-  it 'is false for a huge arch' do
+  it 'is true for a huge arch' do
     is_expected.to run.with_params(h_target_map).and_return(true)
+  end
+
+  it 'is true for a custom cluster with separate ovdb' do
+    $target_map = {
+      'server_targets'           => [primary],
+      'compiler_targets'         => [],
+      'compiler_lb_targets'      => [],
+      'ovdb_targets'             => [ovdb1],
+      'ovdb_lb_targets'          => [],
+      'postgres_targets'         => [],
+      'unmanaged_postgres_hosts' => [],
+      'agent_targets'            => [],
+    }
+    is_expected.to run.with_params($target_map).and_return(true)
+  end
+
+  it 'is false for a custom cluster with separate ovdb but also ovdb on primary' do
+    $target_map = {
+      'server_targets'           => [primary],
+      'compiler_targets'         => [],
+      'compiler_lb_targets'      => [],
+      'ovdb_targets'             => [primary, ovdb1],
+      'ovdb_lb_targets'          => [],
+      'postgres_targets'         => [],
+      'unmanaged_postgres_hosts' => [],
+      'agent_targets'            => [],
+    }
+    is_expected.to run.with_params($target_map).and_return(false)
+  end
+
+  it 'is false for a custom cluster with separate postgres but also postgres on primary' do
+    $target_map = {
+      'server_targets'           => [primary],
+      'compiler_targets'         => [],
+      'compiler_lb_targets'      => [],
+      'ovdb_targets'             => [],
+      'ovdb_lb_targets'          => [],
+      'postgres_targets'         => [primary, postgres],
+      'unmanaged_postgres_hosts' => [],
+      'agent_targets'            => [],
+    }
+    is_expected.to run.with_params($target_map).and_return(false)
   end
 end

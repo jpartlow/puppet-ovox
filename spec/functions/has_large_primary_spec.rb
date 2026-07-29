@@ -10,7 +10,7 @@ describe 'ovox::has_large_primary' do
 
   include_context('shared target maps')
 
-  it 'is true for a tiny arch' do
+  it 'is false for a tiny arch' do
     is_expected.to run.with_params(t_target_map).and_return(false)
   end
 
@@ -22,12 +22,26 @@ describe 'ovox::has_large_primary' do
     is_expected.to run.with_params(m_target_map).and_return(false)
   end
 
-  it 'is false for a large arch' do
+  it 'is true for a large arch' do
     is_expected.to run.with_params(l_target_map).and_return(true)
   end
 
   it 'is false for a huge arch' do
     is_expected.to run.with_params(h_target_map).and_return(false)
+  end
+
+  it 'is false for a custom cluster with postgres separate and on primary' do
+    $target_map = {
+      'server_targets'           => [primary],
+      'compiler_targets'         => [],
+      'compiler_lb_targets'      => [],
+      'ovdb_targets'             => [],
+      'ovdb_lb_targets'          => [],
+      'postgres_targets'         => [primary, postgres],
+      'unmanaged_postgres_hosts' => [],
+      'agent_targets'            => [],
+    }
+    is_expected.to run.with_params($target_map).and_return(false)
   end
 
   context 'with unmanaged postgres' do
