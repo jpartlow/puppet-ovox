@@ -5,14 +5,10 @@
 function ovox::has_tiny_primary(
   Ovox::TargetMap $target_map
 ) >> Boolean {
-  $primary_targets = $target_map['primary_targets']
   $no_ovdb =
-    intersection($primary_targets, $target_map['ovdb_targets']).empty()
+    ! ovox::role_includes('primary', 'ovdb', $target_map)
   $no_postgres =
-    intersection(
-      $primary_targets,
-      $target_map['postgres_targets']
-    ).empty()
+    ! ovox::role_includes('primary', 'postgres', $target_map)
 
-  $no_ovdb and $no_postgres and ($primary_targets.size() == 1)
+  $no_ovdb and $no_postgres
 }

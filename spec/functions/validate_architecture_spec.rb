@@ -82,5 +82,21 @@ describe 'ovox::validate_architecture' do
         ]
       )
     end
+
+    it 'raises an error if only some ovdbs are also postgres' do
+      h_target_map['postgres_targets'] = [ovdb2]
+
+      $errs = call_function('ovox::validate_architecture', h_target_map)
+      expect($errs).to match(
+        [
+          %r{Only some Openvoxdb targets.*are also PostgreSQL targets},
+        ]
+      )
+    end
+
+    it 'returns an empty error set for a separate ovdb/postgres node' do
+      l_target_map['ovdb_targets'] = [postgres]
+      is_expected.to run.with_params(l_target_map).and_return([])
+    end
   end
 end

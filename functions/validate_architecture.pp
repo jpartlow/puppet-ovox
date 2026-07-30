@@ -104,9 +104,31 @@ function ovox::validate_architecture(
     }
   }
 
-#  TODO: There is another intersection problem. If there is
-#  intersection between separate_ovdbs and separate_postgres targets,
-#  all separate_ovdbs must be a subset of separate_postgres targets.
+  # Check that all separate ovdb nodes are or are not also postgres
+  # nodes.
+  $separate_ovdb_targets = ovox::separate_ovdb_targets($target_map)
+  $postgres_targets = $target_map['postgres_targets']
+  $ovdb_postgres_intersection = intersection(
+    $separate_ovdb_targets,
+    $postgres_targets
+  )
+  $no_partial_overlap = (
+    $ovdb_postgres_intersection.empty() or
+    ($separate_ovdb_targets == $ovdb_postgres_intersection)
+  )
+  $ovdb_postgres_errors = $no_partial_overlap ? {
+    false => [
+      @("EOS"/L)
+        Only some Openvoxdb targets (${separate_ovdb_targets}) are \
+        also PostgreSQL targets (${postgres_targets}). Openvoxdb \
+        targets must either be disjoint from PostgreSQL targets, or \
+        a subset of PostgreSQL targets.
+        |- EOS
+    ],
+    default => [],
+  }
 
-  $arch_errs + $role_intersection_errors
+  $arch_errs +
+    $role_intersection_errors +
+    $ovdb_postgres_errors
 }
