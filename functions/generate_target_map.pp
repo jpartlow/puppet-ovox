@@ -17,7 +17,7 @@ function ovox::generate_target_map(
 
   # Obtain actual targets that we can perform reliable equality tests
   # on, rather than just Strings or inventory group name references.
-  $server_targets      = get_targets($host_map['primary_host'])
+  $primary_targets     = get_targets($host_map['primary_host'])
   $compiler_targets    = get_targets($host_map['compiler_hosts'])
   $compiler_lb_targets = get_targets($host_map['compiler_lb_hosts'])
   $ovdb_targets        = get_targets($host_map['ovdb_hosts'])
@@ -34,7 +34,7 @@ function ovox::generate_target_map(
   }
 
   $target_map = {
-    'server_targets'           => $server_targets,
+    'primary_targets'          => $primary_targets,
     'compiler_targets'         => $compiler_targets,
     'compiler_lb_targets'      => $compiler_lb_targets,
     'ovdb_targets'             => $ovdb_targets,

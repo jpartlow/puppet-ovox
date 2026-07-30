@@ -54,7 +54,7 @@ describe 'ovox::generate_target_map' do
       result = call_function('ovox::generate_target_map', m_host_map, true)
       expect(result).to match(
         {
-          'server_targets'           => [a_target('primary.spec')],
+          'primary_targets'          => [a_target('primary.spec')],
           'compiler_targets'         => [
             a_target('compiler1.spec'),
             a_target('compiler2.spec')
@@ -77,7 +77,7 @@ describe 'ovox::generate_target_map' do
       result = call_function('ovox::generate_target_map', h_host_map, false)
       expect(result).to match(
         {
-          'server_targets'           => [a_target('primary.spec')],
+          'primary_targets'          => [a_target('primary.spec')],
           'compiler_targets'         => [
             a_target('compiler1.spec'),
             a_target('compiler2.spec')
@@ -103,7 +103,7 @@ describe 'ovox::generate_target_map' do
       result = call_function('ovox::generate_target_map', t_host_map, true)
       expect(result).to match(
         {
-          'server_targets'           => [a_target('primary.spec')],
+          'primary_targets'          => [a_target('primary.spec')],
           'compiler_targets'         => [],
           'compiler_lb_targets'      => [],
           'ovdb_targets'             => [],

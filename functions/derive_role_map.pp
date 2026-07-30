@@ -6,7 +6,7 @@ function ovox::derive_role_map(
   Ovox::TargetMap $target_map,
 ) >> Ovox::RoleMap {
   $role_map = {
-    'primary'     => $target_map['server_targets'],
+    'primary'     => $target_map['primary_targets'],
     'ovdb'        => ovox::separate_ovdb_targets($target_map),
     'postgres'    => ovox::separate_postgres_targets($target_map),
     'compiler'    => $target_map['compiler_targets'],

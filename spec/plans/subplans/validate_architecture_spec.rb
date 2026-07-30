@@ -18,100 +18,35 @@ describe 'plan: ovox::subplans::validate_architecture' do
 
   context 'tiny' do
     let(:params) { t_params }
-    let(:target_map) do
-      {
-        'server_targets'           => [primary],
-        'ovdb_targets'             => [],
-        'postgres_targets'         => [],
-        'compiler_targets'         => [],
-        'compiler_lb_targets'      => [],
-        'ovdb_lb_targets'          => [],
-        'agent_targets'            => [agent],
-        'unmanaged_postgres_hosts' => [],
-        'compiler_pool_address'    => nil,
-        'ovdb_pool_address'        => nil,
-      }
-    end
+    let(:target_map) { t_target_map }
 
     include_examples('run arch plan')
   end
 
   context 'small' do
     let(:params) { s_params }
-    let(:target_map) do
-      {
-        'server_targets'           => [primary],
-        'ovdb_targets'             => [primary],
-        'postgres_targets'         => [primary],
-        'compiler_targets'         => [],
-        'compiler_lb_targets'      => [],
-        'ovdb_lb_targets'          => [],
-        'agent_targets'            => [agent],
-        'unmanaged_postgres_hosts' => [],
-        'compiler_pool_address'    => nil,
-        'ovdb_pool_address'        => nil,
-      }
-    end
+    let(:target_map) { s_target_map }
 
     include_examples('run arch plan')
   end
 
   context 'medium' do
     let(:params) { m_params }
-    let(:target_map) do
-      {
-        'server_targets'           => [primary],
-        'ovdb_targets'             => [primary],
-        'postgres_targets'         => [primary],
-        'compiler_targets'         => [compiler1, compiler2],
-        'compiler_lb_targets'      => [clb],
-        'ovdb_lb_targets'          => [],
-        'agent_targets'            => [agent],
-        'unmanaged_postgres_hosts' => [],
-        'compiler_pool_address'    => nil,
-        'ovdb_pool_address'        => nil,
-      }
-    end
+    let(:target_map) { m_target_map }
 
     include_examples('run arch plan')
   end
 
   context 'large' do
     let(:params) { l_params }
-    let(:target_map) do
-      {
-        'server_targets'           => [primary],
-        'ovdb_targets'             => [primary],
-        'postgres_targets'         => [postgres],
-        'compiler_targets'         => [compiler1, compiler2],
-        'compiler_lb_targets'      => [clb],
-        'ovdb_lb_targets'          => [],
-        'agent_targets'            => [agent],
-        'unmanaged_postgres_hosts' => [],
-        'compiler_pool_address'    => nil,
-        'ovdb_pool_address'        => nil,
-      }
-    end
+    let(:target_map) { l_target_map }
 
     include_examples('run arch plan')
   end
 
   context 'huge' do
     let(:params) { h_params }
-    let(:target_map) do
-      {
-        'server_targets'           => [primary],
-        'ovdb_targets'             => [ovdb1, ovdb2],
-        'postgres_targets'         => [postgres],
-        'compiler_targets'         => [compiler1, compiler2],
-        'compiler_lb_targets'      => [clb],
-        'ovdb_lb_targets'          => [ovdblb],
-        'agent_targets'            => [agent],
-        'unmanaged_postgres_hosts' => [],
-        'compiler_pool_address'    => nil,
-        'ovdb_pool_address'        => nil,
-      }
-    end
+    let(:target_map) { h_target_map }
 
     include_examples('run arch plan')
   end
@@ -122,18 +57,8 @@ describe 'plan: ovox::subplans::validate_architecture' do
       l_params
     end
     let(:target_map) do
-      {
-        'server_targets'           => [primary],
-        'ovdb_targets'             => [postgres],
-        'postgres_targets'         => [postgres],
-        'compiler_targets'         => [compiler1, compiler2],
-        'compiler_lb_targets'      => [clb],
-        'ovdb_lb_targets'          => [],
-        'agent_targets'            => [agent],
-        'unmanaged_postgres_hosts' => [],
-        'compiler_pool_address'    => nil,
-        'ovdb_pool_address'        => nil,
-      }
+      l_target_map['ovdb_targets'] = [postgres]
+      l_target_map
     end
 
     include_examples('run arch plan')

@@ -31,7 +31,7 @@ describe 'ovox::has_tiny_primary' do
 
   it 'is true for a custom cluster with separate ovdb' do
     $target_map = {
-      'server_targets'           => [primary],
+      'primary_targets'          => [primary],
       'compiler_targets'         => [],
       'compiler_lb_targets'      => [],
       'ovdb_targets'             => [ovdb1],
@@ -45,7 +45,7 @@ describe 'ovox::has_tiny_primary' do
 
   it 'is false for a custom cluster with separate ovdb but also ovdb on primary' do
     $target_map = {
-      'server_targets'           => [primary],
+      'primary_targets'          => [primary],
       'compiler_targets'         => [],
       'compiler_lb_targets'      => [],
       'ovdb_targets'             => [primary, ovdb1],
@@ -59,7 +59,7 @@ describe 'ovox::has_tiny_primary' do
 
   it 'is false for a custom cluster with separate postgres but also postgres on primary' do
     $target_map = {
-      'server_targets'           => [primary],
+      'primary_targets'          => [primary],
       'compiler_targets'         => [],
       'compiler_lb_targets'      => [],
       'ovdb_targets'             => [],

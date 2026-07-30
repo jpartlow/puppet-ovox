@@ -379,14 +379,14 @@ describe 'plan: ovox::subplans::install_openvox' do
     end
 
     context 'for a huge arch with different server and db targets' do
-      let(:server_targets) { [ primary ] }
+      let(:primary_targets) { [ primary ] }
       let(:compiler_targets) { [ compiler1, compiler2 ] }
       let(:db_targets) { [ ovdb1, ovdb2 ] }
       # This is unfortunately order dependent because
       # expect_plan.with_params() is going to match the target array
       # exactly...
       let(:all_targets) do
-        server_targets +
+        primary_targets +
           db_targets +
           compiler_targets +
           agent_targets +
@@ -418,7 +418,7 @@ describe 'plan: ovox::subplans::install_openvox' do
             '_catch_errors' => true,
           })
         expect_task('openvox_bootstrap::install')
-          .with_targets(server_targets)
+          .with_targets(primary_targets)
           .with_params({
             'package'    => 'openvox-server',
             'version'    => '8.1.0',
@@ -451,7 +451,7 @@ describe 'plan: ovox::subplans::install_openvox' do
             '_catch_errors' => true,
           })
         expect_task('openvox_bootstrap::install')
-          .with_targets(server_targets + compiler_targets)
+          .with_targets(primary_targets + compiler_targets)
           .with_params({
             'package'    => 'openvoxdb-termini',
             'version'    => 'latest',

@@ -6,8 +6,8 @@
 function ovox::has_large_primary(
   Ovox::TargetMap $target_map
 ) >> Boolean {
-  $server_targets = $target_map['server_targets']
-  $primary = $server_targets[0]
+  $primary_targets = $target_map['primary_targets']
+  $primary = $primary_targets[0]
   $ovdb_on_primary = $target_map['ovdb_targets'].any |$t| {
     $t == $primary
   }
@@ -17,5 +17,5 @@ function ovox::has_large_primary(
 
   $ovdb_on_primary and
     $postgres_not_on_primary and
-    ($server_targets.size() == 1)
+    ($primary_targets.size() == 1)
 }

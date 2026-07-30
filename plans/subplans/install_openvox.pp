@@ -19,13 +19,15 @@
 #   and version for the openvox-agent package to install on all
 #   $targets.
 # @param openvox_server_params The install params for the
-#   openvox-server package to install on the $openvox_server_targets.
+#   openvox-server package to install on the primary target.
+# @param openvox_compiler_params The install params for the
+#   openvox_server package to be installed on compiler targets.
 # @param openvox_db_params The install params for the
-#   openvoxdb package to install on the $openvox_db_targets.
+#   openvoxdb package to install on the openvoxdb targets.
 # @param install_defaults The default parameters to include
 #   in each of the $openvox_*_params hashes.
 # @param install_termini Whether to install the openvoxdb-termini
-#   package on the $openvox_server_targets. The openvoxdb-termini
+#   package on the primary and compiler targets. The openvoxdb-termini
 #   package contains Puppet terminus classes, functions and faces for
 #   interacting with openvoxdb and is typically used to configure
 #   openvox-server for communicating with openvoxdb.
@@ -56,9 +58,9 @@ plan ovox::subplans::install_openvox(
   # Resolve targets in case we were given hostname or inventory group
   # name references instead of Target objects.
   $agent_targets    = $target_map['agent_targets']
-  $server_targets   = $target_map['server_targets']
+  $primary_targets  = $target_map['primary_targets']
   $compiler_targets = $target_map['compiler_targets']
-  $all_server_targets = ($server_targets + $compiler_targets).unique()
+  $all_server_targets = ($primary_targets + $compiler_targets).unique()
   $ovdb_targets       = $target_map['ovdb_targets']
   $ovdb_termini_targets = $install_termini ? {
     true    => $all_server_targets,
@@ -89,7 +91,7 @@ plan ovox::subplans::install_openvox(
   $server_installations = [
     # XXX: There is a minor optimization that could be done here, if
     # $openvox_server_params == $openvox_compiler_params...
-    [$server_targets, 'openvox-server', $openvox_server_params],
+    [$primary_targets, 'openvox-server', $openvox_server_params],
     [$compiler_targets, 'openvox-server', $openvox_compiler_params],
     [$ovdb_targets, 'openvoxdb', $openvox_db_params],
     [$ovdb_termini_targets, 'openvoxdb-termini', $openvox_db_params],

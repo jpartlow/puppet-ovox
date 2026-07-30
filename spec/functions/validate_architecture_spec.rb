@@ -58,7 +58,7 @@ describe 'ovox::validate_architecture' do
 
   context 'overlapping roles' do
     it 'raises an error if compilers overlap another role' do
-      m_target_map['compiler_targets'] << m_target_map['server_targets'][0]
+      m_target_map['compiler_targets'] << m_target_map['primary_targets'][0]
 
       $errs = call_function('ovox::validate_architecture', m_target_map)
       expect($errs).to match([%r{compiler hostnames should be unique}])

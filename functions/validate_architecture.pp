@@ -34,7 +34,7 @@ function ovox::validate_architecture(
   $arch_warnings = [
     # Allow for just agent maps.
     [
-      $target_map['server_targets'].empty(),
+      $target_map['primary_targets'].empty(),
       'No defined primary openvox-server targets.',
     ],
   ]
@@ -103,6 +103,10 @@ function ovox::validate_architecture(
       default => $errors,
     }
   }
+
+#  TODO: There is another intersection problem. If there is
+#  intersection between separate_ovdbs and separate_postgres targets,
+#  all separate_ovdbs must be a subset of separate_postgres targets.
 
   $arch_errs + $role_intersection_errors
 }

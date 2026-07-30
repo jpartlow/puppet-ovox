@@ -13,7 +13,7 @@ RSpec.shared_context('shared target maps') do
   # architecture.
   let(:t_target_map) do
     {
-      'server_targets'           => [primary],
+      'primary_targets'          => [primary],
       'compiler_targets'         => [],
       'compiler_lb_targets'      => [],
       'ovdb_targets'             => [],
@@ -21,12 +21,14 @@ RSpec.shared_context('shared target maps') do
       'postgres_targets'         => [],
       'unmanaged_postgres_hosts' => [],
       'agent_targets'            => [agent],
+      'compiler_pool_address'    => nil,
+      'ovdb_pool_address'        => nil,
     }
   end
 
   let(:s_target_map) do
     {
-      'server_targets'           => [primary],
+      'primary_targets'          => [primary],
       'compiler_targets'         => [],
       'compiler_lb_targets'      => [],
       'ovdb_targets'             => [primary],
@@ -34,12 +36,14 @@ RSpec.shared_context('shared target maps') do
       'postgres_targets'         => [primary],
       'unmanaged_postgres_hosts' => [],
       'agent_targets'            => [agent],
+      'compiler_pool_address'    => nil,
+      'ovdb_pool_address'        => nil,
     }
   end
 
   let(:m_target_map) do
     {
-      'server_targets'           => [primary],
+      'primary_targets'          => [primary],
       'compiler_targets'         => [compiler1, compiler2],
       'compiler_lb_targets'      => [clb],
       'ovdb_targets'             => [primary],
@@ -47,12 +51,14 @@ RSpec.shared_context('shared target maps') do
       'postgres_targets'         => [primary],
       'unmanaged_postgres_hosts' => [],
       'agent_targets'            => [agent],
+      'compiler_pool_address'    => nil,
+      'ovdb_pool_address'        => nil,
     }
   end
 
   let(:l_target_map) do
     {
-      'server_targets'           => [primary],
+      'primary_targets'          => [primary],
       'compiler_targets'         => [compiler1, compiler2],
       'compiler_lb_targets'      => [clb],
       'ovdb_targets'             => [primary],
@@ -60,12 +66,14 @@ RSpec.shared_context('shared target maps') do
       'postgres_targets'         => [postgres],
       'unmanaged_postgres_hosts' => [],
       'agent_targets'            => [agent],
+      'compiler_pool_address'    => nil,
+      'ovdb_pool_address'        => nil,
     }
   end
 
   let(:h_target_map) do
     {
-      'server_targets'           => [primary],
+      'primary_targets'          => [primary],
       'compiler_targets'         => [compiler1, compiler2],
       'compiler_lb_targets'      => [clb],
       'ovdb_targets'             => [ovdb1, ovdb2],
@@ -73,13 +81,15 @@ RSpec.shared_context('shared target maps') do
       'postgres_targets'         => [postgres],
       'unmanaged_postgres_hosts' => [],
       'agent_targets'            => [agent],
+      'compiler_pool_address'    => nil,
+      'ovdb_pool_address'        => nil,
     }
   end
 
   # Variations
   let(:just_agents_target_map) do
     {
-      'server_targets'           => [],
+      'primary_targets'          => [],
       'compiler_targets'         => [],
       'compiler_lb_targets'      => [],
       'ovdb_targets'             => [],
@@ -87,6 +97,8 @@ RSpec.shared_context('shared target maps') do
       'postgres_targets'         => [],
       'unmanaged_postgres_hosts' => [],
       'agent_targets'            => [agent],
+      'compiler_pool_address'    => nil,
+      'ovdb_pool_address'        => nil,
     }
   end
 

@@ -32,7 +32,7 @@ describe 'ovox::has_large_primary' do
 
   it 'is false for a custom cluster with postgres separate and on primary' do
     $target_map = {
-      'server_targets'           => [primary],
+      'primary_targets'          => [primary],
       'compiler_targets'         => [],
       'compiler_lb_targets'      => [],
       'ovdb_targets'             => [],
