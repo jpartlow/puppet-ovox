@@ -1,6 +1,10 @@
 # Coordinate openvox services installation and configuration on a set
 # of provided hosts.
 #
+# @param cluster_id A unique string identifying the cluster of
+#   OpenVox infrastructure being installed. This id is used to isolate
+#   the generated hiera data/cluster/$cluster_id files that inform the
+#   configuration roles used by applies.
 # @param primary_host The primary openvox-server host and certificate
 #   authority.
 # @param ovdb_hosts Array of openvoxdb hosts. By default, this is just
@@ -77,6 +81,8 @@
 #   automatically if it exists (set or calculated from
 #   $compiler_lb_hosts).
 plan ovox::install(
+  String[1]  $cluster_id,
+
   # Hosts
   TargetSpec $primary_host,
   TargetSpec $ovdb_hosts        = $primary_host,
@@ -154,8 +160,8 @@ plan ovox::install(
 
   # Configure openvox services/Install PostgreSQL
   run_plan('ovox::subplans::configure',
+    'cluster_id'           => $cluster_id,
     'target_map'           => $target_map,
-    'manage_postgres'      => $manage_postgres,
     'postgres_version'     => $postgres_version,
     'postgres_credentials' => $postgres_credentials,
     'dns_alt_names'        => $dns_alt_names,
