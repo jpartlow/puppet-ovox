@@ -1,6 +1,7 @@
 .modules
 .plan_cache.json
 .resource_types
+.rerun.json
 .task_cache.json
 .*.sw?
 bolt-debug.log
