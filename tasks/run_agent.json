@@ -1,6 +1,0 @@
-{
-  "description": "Run the OpenVox agent.",
-  "input_method": "stdin",
-  "parameters": {
-  }
-}
