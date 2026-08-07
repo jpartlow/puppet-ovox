@@ -5,9 +5,33 @@ layouts.
 
 ## Usage
 
+Install the [OpenBolt] package on the runner workstation.
+
+`bolt module install` to download additional module dependencies that
+are not part of the openbolt package.
+
+Prepare a params.json.
+
+Prepare an inventory.yaml if your targets are not resolvable.
+NOTE: target names must be resolvable as these will become the CN of
+the certificates generated for the agents.
+
+`bolt plan run ovox::install --params=@params.json`
+
 ## Platforms
 
 ## Reference
+
+## Tests
+
+A local ruby environment (package or `rbenv` provided, for example) is
+required.
+
+To run the specs:
+
+* `bundle install`
+* `bundle exec bolt module install`
+* `bundle exec rspec`
 
 ## License
 
