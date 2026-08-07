@@ -1,12 +1,22 @@
 name: ovox
 modules:
-  - name: puppetlabs/stdlib
-    version_requirement: '>= 9.7 < 10.0.0'
-  - name: puppet/openvox_bootstrap
-    version_requirement: '>= 1.4.0 < 2.0.0'
+  # Dependencies not present in the openbolt package:
   #XXX: Uncomment once live
   ## TODO: switch these once published to forge
   #- git: https://github.com/voxpupuli/puppet-ov_role
   #  ref: main
   #- git: https://github.com/voxpupuli/puppet-ov_profile
   #  ref: main
+
+  # These are required to run the specs, or to run from just an
+  # openbolt gem install (which does not contain the additional
+  # modules).
+  # Dependencies present in the openbolt package:
+  - name: puppetlabs/package
+    version_requirement: '>= 3.1.0 < 4.0.0'
+  - name: puppetlabs/ruby_task_helper
+    version_requirement: '>= 1.0.0 < 2.0.0'
+  - name: puppetlabs/stdlib
+    version_requirement: '>= 9.7 < 10.0.0'
+  - name: puppet/openvox_bootstrap
+    version_requirement: '>= 1.4.0 < 2.0.0'
