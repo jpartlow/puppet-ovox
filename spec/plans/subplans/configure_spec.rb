@@ -55,13 +55,20 @@ describe 'plan: ovox::subplans::configure' do
         with_targets([primary]).
         with_params(configure_params(primary, 'primary'))
       allow_out_message
-      expect_command("mkdir #{cluster_hiera_dir}").
+      expect_command("mkdir -p #{cluster_hiera_dir}").
         with_targets('localhost')
       allow_apply
       expect_task('openvox_bootstrap::configure').
         with_targets([agent]).
         with_params(configure_params(primary))
-      expect_task('ovox::run_agent').
+      expect_plan('ovox::subplans::certs').
+        with_params(
+          {
+            'primary' => primary,
+            'targets' => [agent],
+          }
+        )
+      expect_task('ovox::puppet_agent').
         with_targets([primary, agent])
       expect_task('openvox_bootstrap::configure').
         with_targets([primary, agent]).
@@ -92,9 +99,9 @@ describe 'plan: ovox::subplans::configure' do
         primary,
         ovdb1,
         ovdb2,
-        postgres,
         compiler1,
         compiler2,
+        postgres,
         clb,
         ovdblb,
         agent,
@@ -102,6 +109,8 @@ describe 'plan: ovox::subplans::configure' do
     end
 
     it 'runs for a huge arch' do
+      expect_command("mkdir -p #{cluster_hiera_dir}").
+        with_targets('localhost')
       expect_task('openvox_bootstrap::configure').
         with_targets([primary]).
         with_params(configure_params(primary, 'primary'))
@@ -126,14 +135,29 @@ describe 'plan: ovox::subplans::configure' do
       expect_task('openvox_bootstrap::configure').
         with_targets([ovdblb]).
         with_params(configure_params(primary, 'ovdb_lb'))
-      allow_out_message
-      expect_command("mkdir #{cluster_hiera_dir}").
-        with_targets('localhost')
+      expect_plan('ovox::subplans::certs').
+        with_params(
+          {
+            'primary' => primary,
+            # XXX: This depends on the array ordering matching up
+            # with functions/all_agent_targets.pp, because expect_plan
+            # does not allow for composable matchers (rspec
+            # match_array), that I can see.
+            'targets' => all_targets - [primary, agent],
+          }
+        )
       allow_apply
       expect_task('openvox_bootstrap::configure').
         with_targets([agent]).
-        with_params(configure_params(primary))
-      expect_task('ovox::run_agent').
+        with_params(configure_params(clb))
+      expect_plan('ovox::subplans::certs').
+        with_params(
+          {
+            'primary' => primary,
+            'targets' => [agent],
+          }
+        )
+      expect_task('ovox::puppet_agent').
         with_targets(all_targets)
       expect_task('openvox_bootstrap::configure').
         with_targets(all_targets).

@@ -55,18 +55,42 @@ plan ovox::subplans::configure(
   Boolean $agent_service_enabled = true,
   String[1] $hiera_data_dir = 'ovox/../data',
 ) {
+  ##############################################
+  # Setup targets and derive architecture roles.
+
   # TargetMap type has a singular primary_targets array.
   $primary = $target_map['primary_targets'][0]
   # Non-infrastructure agents
   $agent_targets = $target_map['agent_targets']
   $all_targets = ovox::all_agent_targets($target_map)
   $infrastructure_targets = $all_targets - $agent_targets
+  $non_primary_infra = $infrastructure_targets - [$primary]
+
   $role_map = ovox::derive_role_map($target_map)
 
   # Store the role class of each infrastructure node.
   $infrastructure_targets.each() |$t| {
     set_var($t, 'role', ovox::get_role($t, $role_map))
   }
+
+  ##################################################
+  # Write local Hiera configuration for the cluster.
+
+  # generate profile flags for role specialization
+  $infra_config = {
+    # TODO: Key puppet/openvoxdb/postgresql etc module configuration settings
+  }
+  $profile_flags = ovox::derive_profile_flags($target_map)
+  $hiera_map = $infra_config + $profile_flags
+
+  # write local hiera config
+  $hiera_root = find_file($hiera_data_dir)
+  $hiera_cluster_dir = "${hiera_root}/cluster/${cluster_id}"
+  run_command("mkdir -p ${hiera_cluster_dir}", 'localhost')
+  $hiera_layer = "${hiera_cluster_dir}/common.yaml"
+  file::write($hiera_layer, stdlib::to_yaml($hiera_map))
+
+  # TODO: minimally we need a cluster/%{cluster_id}/role/compiler.yaml
 
   #########################################################
   # Configure puppet.conf and csr for infrastructure nodes.
@@ -93,27 +117,17 @@ plan ovox::subplans::configure(
 
     $task_params
   }
-
 #  out::message($infra_configure_results)
 
-  ##################################################
-  # Write local Hiera configuration for the cluster.
+  ###################################
+  # Sign infrastructure certificates.
 
-  # generate profile flags for role specialization
-  $infra_config = {
-    # TODO: Key puppet/openvoxdb/postgresql etc module configuration settings
+  if $non_primary_infra.length() > 0 {
+    run_plan('ovox::subplans::certs',
+      'primary' => $primary,
+      'targets' => $non_primary_infra,
+    )
   }
-  $profile_flags = ovox::derive_profile_flags($target_map)
-  $hiera_map = $infra_config + $profile_flags
-
-  # write local hiera config
-  $hiera_root = find_file($hiera_data_dir)
-  $hiera_cluster_dir = "${hiera_root}/cluster/${cluster_id}"
-  run_command("mkdir -p ${hiera_cluster_dir}", 'localhost')
-  $hiera_layer = "${hiera_cluster_dir}/common.yaml"
-  file::write($hiera_layer, stdlib::to_yaml($hiera_map))
-
-  # TODO: minimally we need a cluster/%{cluster_id}/role/compiler.yaml
 
   #################################
   # Apply roles to nodes in stages.
@@ -136,6 +150,9 @@ plan ovox::subplans::configure(
   }
 #  out::message($apply_results)
 
+  #########################
+  # Setup non-infra agents.
+
   # We can now setup puppet.conf on any pure agent nodes to point to
   # the compilers.
   # compiler_pool_address or clb[0] or primary if no compilers...
@@ -152,14 +169,27 @@ plan ovox::subplans::configure(
   )
 #  out::message($agent_configure_results)
 
+  # Sign agent certs
+  if $agent_targets.length() > 0 {
+    run_plan('ovox::subplans::certs',
+      'primary' => $primary,
+      'targets' => $agent_targets,
+    )
+  }
+
   ################################################
   # Setup primary ovox-control control repository.
 
   # TODO: setup control repo on the primary (this is separate from any
   # r10k configuration...)
 
+  ##################
+  # Final validation
+
   # Validate agent runs
-  $agent_results = run_task('ovox::run_agent', $all_targets)
+  $agent_results = run_task('ovox::puppet_agent', $all_targets,
+    'command' => 'run',
+  )
 #  out::message($agent_results)
 
   # Ensure agent service is started and enabled.
