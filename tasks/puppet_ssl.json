@@ -1,0 +1,19 @@
+{
+  "description": "Invoke the openvox ssl subcommand.",
+  "input_method": "stdin",
+  "files": [
+    "ruby_task_helper/files/task_helper.rb",
+    "ovox/lib/ovox/task_dispatch.rb"
+  ],
+  "parameters": {
+    "command": {
+      "type": "Enum[generate]",
+      "description": "Action to take with the ssl subcommand."
+    },
+    "allow_existing_csr": {
+      "type": "Boolean",
+      "description": "Do not fail if csr already submitted. ('puppet-ssl submit_request' exits 1 if csr already exists on ca.)",
+      "default": true
+    }
+  }
+}
