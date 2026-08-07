@@ -1,0 +1,28 @@
+{
+  "description": "Invoke the openvox-server ca subcommand.",
+  "input_method": "stdin",
+  "files": [
+    "ruby_task_helper/files/task_helper.rb",
+    "ovox/lib/ovox/task_dispatch.rb"
+  ],
+  "parameters": {
+    "command": {
+      "type": "Enum[list,sign]",
+      "description": "Action to take with the ssl subcommand."
+    },
+    "certnames": {
+      "type": "Variant[String[1],Array[String[1],1]]",
+      "description": "Certname(s) to act on."
+    },
+    "check_if_signed": {
+      "type": "Boolean",
+      "description": "Check if certname(s) already signed before attempting sign again.",
+      "default": true
+    },
+    "format": {
+      "type": "Enum[json,text]",
+      "description": "Format for list output.",
+      "default": "json"
+    }
+  }
+}
