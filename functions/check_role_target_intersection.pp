@@ -10,7 +10,7 @@
 function ovox::check_role_target_intersection(
   String $role,
   Hash[String,Array[Target]] $role_map,
-) >> Array[String] {
+) >> Array[String[1]] {
   if ! ($role in $role_map) {
     fail("ovox::check_role_target_intersection: Role '${role}' not found in the given role_map hash (keys: ${role_map.keys()})")
   }
@@ -21,7 +21,7 @@ function ovox::check_role_target_intersection(
     $other_targets = $pair[1]
     $conflicts = intersection($role_targets, $other_targets)
     if !$conflicts.empty() {
-      $err = "The ${role} hostnames should be unique, but were found in the ${other_role} list: ${conflicts}"
+      $err = "Error: The ${role} hostnames should be unique, but were found in the ${other_role} list: ${conflicts}"
       $errors + [$err]
     } else {
       $errors

@@ -4,7 +4,7 @@
 #
 # The keys are the spefic ov_role::<role_name>.
 type Ovox::RoleMap = Struct[{
-  primary     => Array[Target,1,1],
+  primary     => Array[Target],
   ovdb        => Array[Target],
   postgres    => Array[Target],
   compiler    => Array[Target],

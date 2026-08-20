@@ -5,8 +5,11 @@
 #
 # This only addresses the simple case of uniform role classification
 # across the cluster. In the case of the primary, the module only
-# supports one node. In the case of ovdb nodes that are not the
-# primary, this assumes they all either have or do not have postgres. 
+# supports one node for autoconfiguration. In the case of ovdb nodes
+# that are not the primary, this assumes they all either have or do
+# not have postgres.
+#
+# All other cases are ambiguous, and require manual configuration.
 #
 # @param target_map Ovox::TargetMap instance for the cluster.
 function ovox::derive_profile_flags(

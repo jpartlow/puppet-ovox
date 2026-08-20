@@ -75,22 +75,29 @@ plan ovox::subplans::configure(
 
   ##################################################
   # Write local Hiera configuration for the cluster.
-
-  # generate profile flags for role specialization
-  $infra_config = {
-    # TODO: Key puppet/openvoxdb/postgresql etc module configuration settings
-  }
-  $profile_flags = ovox::derive_profile_flags($target_map)
-  $hiera_map = $infra_config + $profile_flags
-
-  # write local hiera config
   $hiera_root = find_file($hiera_data_dir)
   $hiera_cluster_dir = "${hiera_root}/cluster/${cluster_id}"
-  run_command("mkdir -p ${hiera_cluster_dir}", 'localhost')
-  $hiera_layer = "${hiera_cluster_dir}/common.yaml"
-  file::write($hiera_layer, stdlib::to_yaml($hiera_map))
+  run_command("mkdir -p ${hiera_cluster_dir}/role", 'localhost')
 
-  # TODO: minimally we need a cluster/%{cluster_id}/role/compiler.yaml
+  $hiera_layers = ovox::generate_hiera_layers(
+    $target_map,
+    $hiera_cluster_dir,
+    {
+      'postgres_version' => $postgres_version,
+    }
+  )
+
+  # write local hiera configs
+  # XXX: Needs to take into account re-runs that produce a different
+  # set of layers...so if a map is empty, overwriting, and if there
+  # are hiera layers left over from previous run that aren't being
+  # touched, they should probably be removed. But it's important not
+  # to remove anything in the cluster_id/custom layers...
+  $hiera_layers.each() |$layer, $map| {
+    if !$map.empty() {
+      file::write($layer, stdlib::to_yaml($map))
+    }
+  }
 
   #########################################################
   # Configure puppet.conf and csr for infrastructure nodes.
@@ -133,15 +140,16 @@ plan ovox::subplans::configure(
   # Apply roles to nodes in stages.
 
   $apply_results = [
-    # separate postgres should be up before ovdb
+    # postgres should be up before openvoxdb since the later
+    # needs the database configured before it can perform migrations
     $role_map['postgres'],
-    # XXX: There may not be much reason to separate these three stages?
-    # primary, separate openvoxdb
-    $role_map['primary'] + $role_map['ovdb'],
-    # compilers
-    $role_map['compiler'],
-    # load balancers
-    $role_map['compiler_lb'] + $role_map['ovdb_lb'],
+    # openvoxdb should be up before openvox-servers since the
+    # classes for configuring server for ovdb perform a status check
+    # on ovdb first
+    $role_map['ovdb'] + $role_map['ovdb_lb'],
+    # primary and compilers
+    # (in a simple primary, the above relations are handled in the class itself)
+    $role_map['primary'] + $role_map['compiler'] + $role_map['compiler_lb']
   ].map() |$targets| {
     apply($targets) {
       # The role var has been set in the Target.vars.
@@ -181,7 +189,7 @@ plan ovox::subplans::configure(
   # Setup primary ovox-control control repository.
 
   # TODO: setup control repo on the primary (this is separate from any
-  # r10k configuration...)
+  # r10k configuration...or is a subset of r10k configuration)
 
   ##################
   # Final validation

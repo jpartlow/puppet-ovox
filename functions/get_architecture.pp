@@ -1,13 +1,20 @@
 # Given a TargetMap, perform some hueristics and return the
 # appropriate architecture label from Ovox::Architectures.
 #
-# see docs/architectures.md for a description of the architectures.
+# see docs/architectures.md for a description of the named architectures.
+# see types/architectures.pp for notes on 'custom', 'ambiguous' and
+# 'error' values.
 #
 # @param target_map Ovox::TargetMap instance for the cluster.
 function ovox::get_architecture(
   Ovox::TargetMap $target_map,
 ) >> Ovox::Architectures {
-  if (
+  $info = ovox::validate_architecture($target_map)
+  if !$info['errors'].empty() {
+    $architecture = 'error'
+  } elsif !$info['ambiguities'].empty() {
+    $architecture = 'ambiguous'
+  } elsif (
     ovox::is_tinyish($target_map) and
     ! ovox::has_compilers($target_map)
   ) {

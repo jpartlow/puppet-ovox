@@ -7,7 +7,7 @@ describe 'plan: ovox::subplans::configure' do
 
   around(:each) do |example|
     # The plan would do this, if the run_command weren't stubbed.
-    FileUtils.mkdir_p(cluster_hiera_dir)
+    FileUtils.mkdir_p("#{cluster_hiera_dir}/role")
     example.run
   ensure
     FileUtils.remove_entry_secure(tempdir)
@@ -55,7 +55,7 @@ describe 'plan: ovox::subplans::configure' do
         with_targets([primary]).
         with_params(configure_params(primary, 'primary'))
       allow_out_message
-      expect_command("mkdir -p #{cluster_hiera_dir}").
+      expect_command("mkdir -p #{cluster_hiera_dir}/role").
         with_targets('localhost')
       allow_apply
       expect_task('openvox_bootstrap::configure').
@@ -82,11 +82,23 @@ describe 'plan: ovox::subplans::configure' do
       result = run_plan('ovox::subplans::configure', params)
       expect(result.ok?).to(eq(true), result.value.to_s)
 
-      cluster_hiera = YAML.safe_load_file("#{cluster_hiera_dir}/common.yaml")
+      cluster_hiera = YAML.safe_load_file("#{cluster_hiera_dir}/ovox.yaml")
       expect(cluster_hiera).to match(
         {
           'ov_role::primary::install_ovdb'     => true,
           'ov_role::primary::install_postgres' => true,
+          'openvoxdb::database::postgresql::listen_address' => 'localhost',
+          'openvoxdb::database::postgresql::postgresql_ssl_on' => true,
+          'openvoxdb::database::postgresql::puppetdb_server' => 'primary.spec',
+          'openvoxdb::server::database_host' => 'localhost',
+          'openvoxdb::server::postgresql::postgresql_ssl_on' => true,
+          'ov_profile::postgres::additional_ovdb_servers' => [],
+          'puppet::client_package' => 'openvox-agent',
+          'puppet::server::puppetdb::server' => 'primary.spec',
+          'puppet::server_foreman' => false,
+          'puppet::server_package' => 'openvox-server',
+          'puppet::server_reports' => 'puppetdb',
+          'puppet::server_storeconfigs' => true,
         }
       )
     end
@@ -109,7 +121,7 @@ describe 'plan: ovox::subplans::configure' do
     end
 
     it 'runs for a huge arch' do
-      expect_command("mkdir -p #{cluster_hiera_dir}").
+      expect_command("mkdir -p #{cluster_hiera_dir}/role").
         with_targets('localhost')
       expect_task('openvox_bootstrap::configure').
         with_targets([primary]).
@@ -171,12 +183,24 @@ describe 'plan: ovox::subplans::configure' do
       result = run_plan('ovox::subplans::configure', params)
       expect(result.ok?).to(eq(true), result.value.to_s)
 
-      cluster_hiera = YAML.safe_load_file("#{cluster_hiera_dir}/common.yaml")
+      cluster_hiera = YAML.safe_load_file("#{cluster_hiera_dir}/ovox.yaml")
       expect(cluster_hiera).to match(
         {
           'ov_role::primary::install_ovdb'     => false,
           'ov_role::primary::install_postgres' => false,
           'ov_role::ovdb::install_postgres'    => false,
+          'openvoxdb::database::postgresql::listen_address' => 'postgres.spec',
+          'openvoxdb::database::postgresql::postgresql_ssl_on' => true,
+          'openvoxdb::database::postgresql::puppetdb_server' => 'ovdb1.spec',
+          'openvoxdb::server::database_host' => 'postgres.spec',
+          'openvoxdb::server::postgresql::postgresql_ssl_on' => true,
+          'ov_profile::postgres::additional_ovdb_servers' => ['ovdb2.spec'],
+          'puppet::client_package' => 'openvox-agent',
+          'puppet::server::puppetdb::server' => 'ovdblb.spec',
+          'puppet::server_foreman' => false,
+          'puppet::server_package' => 'openvox-server',
+          'puppet::server_reports' => 'puppetdb',
+          'puppet::server_storeconfigs' => true,
         }
       )
     end

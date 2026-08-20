@@ -5,15 +5,31 @@ defaults:
   datadir: 'data'
   data_hash: 'yaml_data'
 
+# The module will automatically write configuration into the
+# cluster/%{cluster_id} common, role and node layers when working with
+# a known architecture.
+#
+# The cluster/%{cluster_id}/custom layers are reserved for manual
+# configuration of a custom architecture and will not be written to
+# by the module.
 hierarchy:
+  - name: 'Custom node specific data per cluster'
+    path: 'cluster/%{cluster_id}/custom/node/%{trusted.certname}.yaml'
+
   - name: 'Node specific data per cluster'
     path: 'cluster/%{cluster_id}/node/%{trusted.certname}.yaml'
+
+  - name: 'Custom role specific data per cluster'
+    path: 'cluster/%{cluster_id}/custom/role/%{role}.yaml'
 
   - name: 'Role specific data per cluster'
     path: 'cluster/%{cluster_id}/role/%{role}.yaml'
 
-  - name: 'Common cluster data'
-    path: 'cluster/${cluster_id}/common.yaml'
+  - name: 'Custom ovox cluster data'
+    path: 'cluster/%{cluster_id}/custom/ovox.yaml'
+
+  - name: 'Common ovox cluster data'
+    path: 'cluster/%{cluster_id}/ovox.yaml'
 
   - name: 'Default data'
     path: 'common.yaml'

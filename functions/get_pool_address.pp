@@ -17,7 +17,7 @@ function ovox::get_pool_address(
 
   if $lb_pool_address =~ Undef {
     $pool_address = $lb_targets.empty() ? {
-      false   => $lb_targets[0].host(),
+      false   => $lb_targets[0].name(),
       default => undef,
     }
   } else {

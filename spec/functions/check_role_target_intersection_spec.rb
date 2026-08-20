@@ -34,7 +34,7 @@ describe 'ovox::check_role_target_intersection' do
     is_expected.to(
       run.with_params('spec2', role_map).and_return(
         [
-          "The spec2 hostnames should be unique, but were found in the conflict1 list: [t3]",
+          "Error: The spec2 hostnames should be unique, but were found in the conflict1 list: [t3]",
         ]
       )
     )
@@ -44,8 +44,8 @@ describe 'ovox::check_role_target_intersection' do
     is_expected.to(
       run.with_params('spec3', role_map).and_return(
         [
-          "The spec3 hostnames should be unique, but were found in the conflict1 list: [t5]",
-          "The spec3 hostnames should be unique, but were found in the conflict2 list: [t6]",
+          "Error: The spec3 hostnames should be unique, but were found in the conflict1 list: [t5]",
+          "Error: The spec3 hostnames should be unique, but were found in the conflict2 list: [t6]",
         ]
       )
     )

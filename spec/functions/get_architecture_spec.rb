@@ -45,22 +45,50 @@ describe 'ovox::get_architecture' do
     end
   end
 
-  it 'returns custom for strange things' do
-    t_target_map['compiler_targets'] << compiler1
-    is_expected.to(
-      run.with_params(t_target_map).
-        and_return('custom')
-    )
+  # Some examples of custom architectures.
+  context 'custom' do
+    it 'returns custom for tiny with compilers' do
+      t_target_map['compiler_targets'] << compiler1
+      t_target_map['compiler_pool_address'] = 'compiler1.spec'
+      is_expected.to(
+        run.with_params(t_target_map).
+          and_return('custom')
+      )
+    end
 
-    l_target_map['compiler_targets'] = []
-    is_expected.to(
-      run.with_params(l_target_map).
-        and_return('custom')
-    )
+    it 'returns custom for large without compilers' do
+      l_target_map['compiler_targets'] = []
+      is_expected.to(
+        run.with_params(l_target_map).
+          and_return('custom')
+      )
+    end
 
-    is_expected.to(
-      run.with_params(unmanaged_postgres(s_target_map)).
-        and_return('custom')
-    )
+    it 'returns custom for a small with unmanaged postgres' do
+      is_expected.to(
+        run.with_params(unmanaged_postgres(s_target_map)).
+          and_return('custom')
+      )
+    end
+  end
+
+  context 'ambiguous' do
+    it 'returns ambiguous for more than one postgres' do
+      l_target_map['postgres_targets'] << a_target('postgres2.spec')
+      is_expected.to(
+        run.with_params(l_target_map).
+          and_return('ambiguous')
+      )
+    end
+  end
+
+  context 'errors' do
+    it 'returns error for role conflicts' do
+      l_target_map['compiler_targets'] << clb
+      is_expected.to(
+        run.with_params(l_target_map).
+          and_return('error')
+      )
+    end
   end
 end
