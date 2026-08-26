@@ -44,6 +44,10 @@ plan ovox::subplans::certs (
       'command'   => 'sign',
       'certnames' => $targets.map |$t| { $t.name },
     )
+
+    run_task('ovox::puppet_ssl', $targets,
+      'command' => 'download',
+    )
   } else {
     out::message('No targets, nothing to sign.')
   }

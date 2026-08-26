@@ -14,15 +14,15 @@ describe 'task: puppet_ssl.rb' do
 
   let(:success) { instance_double(Process::Status, success?: true, exitstatus: 0) }
   let(:failed) { instance_double(Process::Status, success?: false, exitstatus: 1) }
-  let(:submit_request) do
-    [
-      '/opt/puppetlabs/bin/puppet',
-      'ssl',
-      'submit_request',
-    ]
-  end
 
   context 'generate' do
+    let(:submit_request) do
+      [
+        '/opt/puppetlabs/bin/puppet',
+        'ssl',
+        'submit_request',
+      ]
+    end
     let(:csr_submitted_err) do
       <<~ERR
         Error: Could not run: Could not submit certificate request \
@@ -82,6 +82,40 @@ describe 'task: puppet_ssl.rb' do
           TaskHelper::Error,
           %r{Could not submit certificate request.*due to a conflict on the server}
         )
+      )
+    end
+  end
+
+  context 'download' do
+    let(:download_cert) do
+      [
+        '/opt/puppetlabs/bin/puppet',
+        'ssl',
+        'download_cert',
+      ]
+    end
+    it 'runs and returns successful result' do
+      expect(Open3).to(
+        receive(:capture2e).and_return(['output', success])
+      )
+
+      expect(task.task(command: 'download', **kwargs)).to eq(
+        {
+          command: download_cert,
+          output: 'output',
+          code: 0,
+          success: true,
+        }
+      )
+    end
+
+    it 'raises if fails' do
+      expect(Open3).to(
+        receive(:capture2e).and_return(['oops', failed])
+      )
+
+      expect { task.task(command: 'download', **kwargs) }.to(
+        raise_error(TaskHelper::Error, %r{oops})
       )
     end
   end

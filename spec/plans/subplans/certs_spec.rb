@@ -31,6 +31,14 @@ describe 'plan: ovox::subplans::certs' do
           'format'          => 'json',
         }
       )
+    expect_task('ovox::puppet_ssl').
+      with_targets([compiler1, compiler2]).
+      with_params(
+        {
+          'command' => 'download',
+          'allow_existing_csr' => true,
+        }
+      )
 
     result = run_plan('ovox::subplans::certs', params)
     expect(result.ok?).to(eq(true), result.value.to_s)

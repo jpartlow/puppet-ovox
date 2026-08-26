@@ -7,7 +7,7 @@
   ],
   "parameters": {
     "command": {
-      "type": "Enum[generate]",
+      "type": "Enum[generate,download]",
       "description": "Action to take with the ssl subcommand."
     },
     "allow_existing_csr": {

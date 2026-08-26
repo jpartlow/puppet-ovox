@@ -9,15 +9,16 @@ class PuppetSSL < TaskHelper
 
   DISPATCH_MAP = {
     generate: :generate_and_submit_csr,
+    download: :download_cert,
   }.freeze
 
   PUPPET_SSL_CSR_SUBMITTED_ERROR = %r{Could not submit certificate request for .*/puppet-ca/v1 due to a conflict on the server}
 
-  def generate_and_submit_csr(allow_existing_csr: true, **kwargs)
+  def ssl_command(command, &postproc)
     cmd = [
       "#{PUPPET_BIN}/puppet",
       'ssl',
-      'submit_request',
+      command.to_s,
     ]
     output, status = Open3.capture2e(*cmd)
     results = {
@@ -25,12 +26,26 @@ class PuppetSSL < TaskHelper
       output: output,
       code: status.exitstatus,
     }
-    already_submitted =
-      output.match?(PUPPET_SSL_CSR_SUBMITTED_ERROR)
-    results[:success] =
-      status.success? || (allow_existing_csr && already_submitted)
+    if block_given?
+      yield(output, status, results)
+    else
+      results[:success] = status.success?
+    end
+    results
+  end
+
+  def generate_and_submit_csr(allow_existing_csr: true, **kwargs)
+    results = ssl_command(:submit_request) do |o, s, r|
+      already_submitted =
+        o.match?(PUPPET_SSL_CSR_SUBMITTED_ERROR)
+      r[:success] = s.success? || (allow_existing_csr && already_submitted)
+    end
 
     results
+  end
+
+  def download_cert(**_kwargs)
+    ssl_command(:download_cert)
   end
 
   def task(command:, **kwargs)
