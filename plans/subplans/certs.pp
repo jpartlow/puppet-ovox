@@ -7,11 +7,23 @@
 # be left in a running state since it must be up to receive csrs and
 # sign.
 #
+# This plan will also ensure that the *puppetdb ssl-setup* command is
+# run after agent certs are generated if it is given a set of
+# $ovdb_targets.
+#
+# Note: the openvoxdb package magically runs 'puppetdb ssl-setup' as
+# part of its post-install steps, but if the package has been
+# installed prior to puppet certs being generated (as is the case with
+# the ovox::subplans::install_openvox plan...), this doesn't help.
+#
 # @param primary The openvoxserver CA node.
 # @param targets The nodes to generate and sign certs for.
+# @param ovdb_targets Any openvoxdb targets that additionally need to
+#   run *puppetdb ssl-setup*.
 plan ovox::subplans::certs (
   Target        $primary,
   Array[Target] $targets,
+  Array[Target] $ovdb_targets = [],
 )  {
   # Stand up CA
   apply($primary) {
@@ -35,4 +47,9 @@ plan ovox::subplans::certs (
   } else {
     out::message('No targets, nothing to sign.')
   }
+
+  # Setup openvoxdb certs
+  run_task('ovox::puppetdb', $ovdb_targets,
+    'command' => 'ssl-setup',
+  )
 }

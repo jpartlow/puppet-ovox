@@ -57,6 +57,14 @@ describe 'plan: ovox::subplans::configure' do
       allow_out_message
       expect_command("mkdir -p #{cluster_hiera_dir}/role").
         with_targets('localhost')
+      expect_plan('ovox::subplans::certs').
+        with_params(
+          {
+            'primary' => primary,
+            'targets' => [],
+            'ovdb_targets' => [primary],
+          }
+        )
       allow_apply
       expect_task('openvox_bootstrap::configure').
         with_targets([agent]).
@@ -156,6 +164,7 @@ describe 'plan: ovox::subplans::configure' do
             # does not allow for composable matchers (rspec
             # match_array), that I can see.
             'targets' => all_targets - [primary, agent],
+            'ovdb_targets' => [ovdb1, ovdb2],
           }
         )
       allow_apply

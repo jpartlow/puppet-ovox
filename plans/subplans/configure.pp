@@ -108,6 +108,9 @@ plan ovox::subplans::configure(
     $infrastructure_targets
   ) |$target| {
     $task_params = {
+      # NOTE: This is not redundant with the later theforeman-puppet
+      # apply managing puppet.conf, because the ovox::subplans::cert
+      # invocations of puppet ssl also need the server set...
       'puppet_conf' => {
         'main' => {
           'server' => $primary.name(),
@@ -129,12 +132,11 @@ plan ovox::subplans::configure(
   ###################################
   # Sign infrastructure certificates.
 
-  if $non_primary_infra.length() > 0 {
-    run_plan('ovox::subplans::certs',
-      'primary' => $primary,
-      'targets' => $non_primary_infra,
-    )
-  }
+  run_plan('ovox::subplans::certs',
+    'primary'      => $primary,
+    'targets'      => $non_primary_infra,
+    'ovdb_targets' => $target_map['ovdb_targets'],
+  )
 
   #################################
   # Apply roles to nodes in stages.

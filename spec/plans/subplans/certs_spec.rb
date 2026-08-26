@@ -45,4 +45,24 @@ describe 'plan: ovox::subplans::certs' do
     result = run_plan('ovox::subplans::certs', params)
     expect(result.ok?).to(eq(true), result.value.to_s)
   end
+
+  it 'performs puppetdb ssl-setup' do
+    allow_apply
+    expect_out_message
+    expect_task('ovox::puppetdb').
+      with_targets(ovdb1).
+      with_params(
+        {
+          'command' => 'ssl-setup',
+        }
+      )
+
+    p = {
+      'primary'      => primary,
+      'targets'      => [],
+      'ovdb_targets' => [ovdb1],
+    }
+    result = run_plan('ovox::subplans::certs', p)
+    expect(result.ok?).to(eq(true), result.value.to_s)
+  end
 end
