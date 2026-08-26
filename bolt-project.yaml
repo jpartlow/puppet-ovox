@@ -1,12 +1,11 @@
 name: ovox
 modules:
   # Dependencies not present in the openbolt package:
-  #XXX: Uncomment once live
   ## TODO: switch these once published to forge
-  #- git: https://github.com/voxpupuli/puppet-ov_role
-  #  ref: main
-  #- git: https://github.com/voxpupuli/puppet-ov_profile
-  #  ref: main
+  - git: https://github.com/jpartlow/puppet-ov_role
+    ref: main
+  - git: https://github.com/jpartlow/puppet-ov_profile
+    ref: main
 
   # These are required to run the specs, or to run from just an
   # openbolt gem install (which does not contain the additional
