@@ -9,9 +9,9 @@ describe 'ovox::get_postgres_address' do
 
   include_context('shared target maps')
 
-  it 'returns localhost in a small cluster' do
+  it 'returns the primary host in a small cluster' do
     is_expected.to(
-      run.with_params(s_target_map).and_return('localhost')
+      run.with_params(s_target_map).and_return('primary.spec')
     )
   end
 
@@ -36,11 +36,11 @@ describe 'ovox::get_postgres_address' do
     )
   end
 
-  it 'returns localhost in a custom configuration with separate ovdb/postgres host' do
+  it 'returns postgres host in a custom configuration with separate ovdb/postgres host' do
     l_target_map['ovdb_targets'] = [postgres]
     is_expected.to(
       run.with_params(l_target_map).
-        and_return('localhost')
+        and_return('postgres.spec')
     )
   end
 

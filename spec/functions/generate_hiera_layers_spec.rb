@@ -12,15 +12,30 @@ describe 'ovox::generate_hiera_layers' do
   let(:hiera_cluster_dir) { '/tmp/hiera/cluster/foo' }
   let(:base_config) do
     {
-      'puppet::client_package'             => 'openvox-agent',
-      'puppet::server_package'             => 'openvox-server',
-      'puppet::server_foreman'             => false,
+      'puppet::agent_manage_environment' => false,
+      'puppet::agent_server_hostname'    => 'primary.spec',
+      'puppet::client_package'           => 'openvox-agent',
+      'puppet::server_package'           => 'openvox-server',
+      'puppet::server_foreman'           => false,
+    }
+  end
+  let(:server_config) do
+    {
+      'puppet::server'                => true,
+      'puppet::server_external_nodes' => '',
+    }
+  end
+  let(:ovdb_postgres_common_config) do
+    {
+      'openvoxdb::database::postgresql::postgresql_ssl_on' => true,
+      'openvoxdb::server::postgresql_ssl_on' => true,
     }
   end
   let(:ovdb_common_config) do
     {
-      'openvoxdb::database::postgresql::postgresql_ssl_on' => true,
-      'openvoxdb::server::postgresql::postgresql_ssl_on' => true,
+      'openvoxdb::master::config::manage_storeconfigs' => false,
+      'openvoxdb::master::config::restart_puppet' => false,
+      'openvoxdb::master::config::strict_validation' => false,
     }
   end
   let(:ovdb_server_common_config) do
@@ -31,22 +46,37 @@ describe 'ovox::generate_hiera_layers' do
   end
   let(:common_config) do
     base_config
+      .merge(server_config)
       .merge(ovdb_common_config)
+      .merge(ovdb_postgres_common_config)
       .merge(ovdb_server_common_config)
+  end
+  let(:compiler_config) do
+    {
+      'puppet::ca_server' => 'primary.spec',
+      'puppet::server'    => true,
+      'puppet::server_ca' => false,
+    }
   end
 
   it 'returns hiera config for a tiny arch' do
-    is_expected.to(
-      run.with_params(t_target_map, hiera_cluster_dir, {})
-        .and_return(
-          {
-            "#{hiera_cluster_dir}/ovox.yaml" => {
-              'ov_role::primary::install_ovdb'     => false,
-              'ov_role::primary::install_postgres' => false,
-            }.merge(base_config),
-            "#{hiera_cluster_dir}/role/compiler.yaml" => {},
-          }
-        )
+    hiera_map = call_function(
+      'ovox::generate_hiera_layers',
+      t_target_map,
+      hiera_cluster_dir,
+      {}
+    )
+    expect(hiera_map).to match(
+      {
+        "#{hiera_cluster_dir}/ovox.yaml" => instance_of(Hash),
+        "#{hiera_cluster_dir}/role/compiler.yaml" => {},
+      }
+    )
+    expect(hiera_map["#{hiera_cluster_dir}/ovox.yaml"]).to match(
+      {
+        'ov_role::primary::install_ovdb'     => false,
+        'ov_role::primary::install_postgres' => false,
+      }.merge(base_config).merge(server_config),
     )
   end
 
@@ -67,13 +97,11 @@ describe 'ovox::generate_hiera_layers' do
       {
         'ov_role::primary::install_ovdb'     => true,
         'ov_role::primary::install_postgres' => true,
-        'openvoxdb::database::postgresql::listen_address' => 'localhost',
+        'openvoxdb::database::postgresql::listen_addresses' => 'primary.spec',
         'openvoxdb::database::postgresql::puppetdb_server' => 'primary.spec',
-        'openvoxdb::database::postgresql::postgresql_ssl_on' => true,
+        'openvoxdb::master::config::puppetdb_server' => 'primary.spec',
+        'openvoxdb::server::database_host' => 'primary.spec',
         'ov_profile::postgres::additional_ovdb_servers' => [],
-        'openvoxdb::server::postgresql::postgresql_ssl_on' => true,
-        'openvoxdb::server::database_host' => 'localhost',
-        'puppet::server::puppetdb::server' => 'primary.spec',
       }.merge(common_config),
     )
   end
@@ -90,24 +118,19 @@ describe 'ovox::generate_hiera_layers' do
     expect(hiera_map).to match(
       {
         "#{hiera_cluster_dir}/ovox.yaml" => instance_of(Hash),
-        "#{hiera_cluster_dir}/role/compiler.yaml" => {
-          'puppet::ca_server' => 'primary.spec',
-          'puppet::server_ca' => false,
-        },
+        "#{hiera_cluster_dir}/role/compiler.yaml" => compiler_config,
       }
     )
     expect(hiera_map["#{hiera_cluster_dir}/ovox.yaml"]).to match(
       {
         'ov_role::primary::install_ovdb'     => true,
         'ov_role::primary::install_postgres' => true,
-        'openvoxdb::database::postgresql::listen_address' => 'localhost',
+        'openvoxdb::database::postgresql::listen_addresses' => 'primary.spec',
         'openvoxdb::database::postgresql::postgres_version' => '16',
         'openvoxdb::database::postgresql::puppetdb_server' => 'primary.spec',
-        'openvoxdb::database::postgresql::postgresql_ssl_on' => true,
+        'openvoxdb::master::config::puppetdb_server' => 'primary.spec',
+        'openvoxdb::server::database_host' => 'primary.spec',
         'ov_profile::postgres::additional_ovdb_servers' => [],
-        'openvoxdb::server::postgresql::postgresql_ssl_on' => true,
-        'openvoxdb::server::database_host' => 'localhost',
-        'puppet::server::puppetdb::server' => 'primary.spec',
       }.merge(common_config),
     )
   end
@@ -122,23 +145,18 @@ describe 'ovox::generate_hiera_layers' do
     expect(hiera_map).to match(
       {
         "#{hiera_cluster_dir}/ovox.yaml" => instance_of(Hash),
-        "#{hiera_cluster_dir}/role/compiler.yaml" => {
-          'puppet::ca_server' => 'primary.spec',
-          'puppet::server_ca' => false,
-        },
+        "#{hiera_cluster_dir}/role/compiler.yaml" => compiler_config,
       }
     )
     expect(hiera_map["#{hiera_cluster_dir}/ovox.yaml"]).to match(
       {
         'ov_role::primary::install_ovdb'     => true,
         'ov_role::primary::install_postgres' => false,
-        'openvoxdb::database::postgresql::listen_address' => 'postgres.spec',
+        'openvoxdb::database::postgresql::listen_addresses' => 'postgres.spec',
         'openvoxdb::database::postgresql::puppetdb_server' => 'primary.spec',
-        'openvoxdb::database::postgresql::postgresql_ssl_on' => true,
-        'ov_profile::postgres::additional_ovdb_servers' => [],
-        'openvoxdb::server::postgresql::postgresql_ssl_on' => true,
+        'openvoxdb::master::config::puppetdb_server' => 'primary.spec',
         'openvoxdb::server::database_host' => 'postgres.spec',
-        'puppet::server::puppetdb::server' => 'primary.spec',
+        'ov_profile::postgres::additional_ovdb_servers' => [],
       }.merge(common_config),
     )
   end
@@ -153,10 +171,7 @@ describe 'ovox::generate_hiera_layers' do
     expect(hiera_map).to match(
       {
         "#{hiera_cluster_dir}/ovox.yaml" => instance_of(Hash),
-        "#{hiera_cluster_dir}/role/compiler.yaml" => {
-          'puppet::ca_server' => 'primary.spec',
-          'puppet::server_ca' => false,
-        },
+        "#{hiera_cluster_dir}/role/compiler.yaml" => compiler_config
       }
     )
     expect(hiera_map["#{hiera_cluster_dir}/ovox.yaml"]).to match(
@@ -164,13 +179,11 @@ describe 'ovox::generate_hiera_layers' do
         'ov_role::ovdb::install_postgres'    => false,
         'ov_role::primary::install_ovdb'     => false,
         'ov_role::primary::install_postgres' => false,
-        'openvoxdb::database::postgresql::listen_address' => 'postgres.spec',
+        'openvoxdb::database::postgresql::listen_addresses' => 'postgres.spec',
         'openvoxdb::database::postgresql::puppetdb_server' => 'ovdb1.spec',
-        'openvoxdb::database::postgresql::postgresql_ssl_on' => true,
-        'ov_profile::postgres::additional_ovdb_servers' => ['ovdb2.spec'],
-        'openvoxdb::server::postgresql::postgresql_ssl_on' => true,
+        'openvoxdb::master::config::puppetdb_server' => 'ovdblb.spec',
         'openvoxdb::server::database_host' => 'postgres.spec',
-        'puppet::server::puppetdb::server' => 'ovdblb.spec',
+        'ov_profile::postgres::additional_ovdb_servers' => ['ovdb2.spec'],
       }.merge(common_config),
     )
   end
@@ -189,19 +202,18 @@ describe 'ovox::generate_hiera_layers' do
     expect(hiera_map).to match(
       {
         "#{hiera_cluster_dir}/ovox.yaml" => instance_of(Hash),
-        "#{hiera_cluster_dir}/role/compiler.yaml" => {
-          'puppet::ca_server' => 'primary.spec',
-          'puppet::server_ca' => false,
-        },
+        "#{hiera_cluster_dir}/role/compiler.yaml" => compiler_config
       }
     )
     expect(hiera_map["#{hiera_cluster_dir}/ovox.yaml"]).to match(
       {
         'ov_role::primary::install_ovdb'     => true,
         'ov_role::primary::install_postgres' => false,
+        'openvoxdb::master::config::puppetdb_server' => 'primary.spec',
         'openvoxdb::server::database_host' => 'unmanaged.postgres.spec',
-        'puppet::server::puppetdb::server' => 'primary.spec',
       }.merge(base_config)
+       .merge(server_config)
+       .merge(ovdb_common_config)
        .merge(ovdb_server_common_config),
     )
   end
@@ -228,11 +240,11 @@ describe 'ovox::generate_hiera_layers' do
           'ov_role::ovdb::install_postgres'    => false,
           'ov_role::primary::install_ovdb'     => false,
           'ov_role::primary::install_postgres' => false,
-          'openvoxdb::database::postgresql::listen_address' => 'postgres.spec',
+          'openvoxdb::database::postgresql::listen_addresses' => 'postgres.spec',
           'openvoxdb::database::postgresql::puppetdb_server' => 'ovdb1.spec',
+          'openvoxdb::master::config::puppetdb_server' => 'ovdb1.spec',
           'openvoxdb::server::database_host' => 'postgres.spec',
           'ov_profile::postgres::additional_ovdb_servers' => [],
-          'puppet::server::puppetdb::server' => 'ovdb1.spec',
         }.merge(common_config),
       )
     end

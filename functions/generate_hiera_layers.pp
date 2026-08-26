@@ -32,13 +32,20 @@ function ovox::generate_hiera_layers(
 
   # Prep hiera configuration layers
   $common_config = {
-    'puppet::client_package' => 'openvox-agent',
-    'puppet::server_package' => 'openvox-server',
-    'puppet::server_foreman' => false,
+    # For the moment, prevent agents managed by the puppet module
+    # from ending up with the 'bolt_catalog' environment...
+    'puppet::agent_manage_environment' => false,
+    # Ensure puppet module sets the primary as the puppetserver
+    # for infrastructure agents.
+    'puppet::agent_server_hostname'    => $ca_server,
+    'puppet::client_package'           => 'openvox-agent',
+    'puppet::server_package'           => 'openvox-server',
+    'puppet::server_foreman'           => false,
   }
 
   if ($architecture == 'ambiguous') or
      ($architecture == 'error') {
+    $server_config      = {}
     $server_ovdb_config = {}
     $ovdb_config        = {}
     $postgres_config    = {}
@@ -49,6 +56,17 @@ function ovox::generate_hiera_layers(
     # XXX: Anything specific for the primary ca server?
     $ca_config = {}
 
+    $server_config = !$target_map['primary_targets'].empty() ? {
+      true => {
+        'puppet::server'                => true,
+        # Do not setup for foreman ENC...must be an empty string
+        # rather than undef to be picked by Hiera automatic parameter
+        # lookup.
+        'puppet::server_external_nodes' => '',
+      },
+      default => {},
+    }
+
     if $target_map['ovdb_targets'].empty() {
       $server_ovdb_config = {}
       $ovdb_config        = {}
@@ -56,8 +74,19 @@ function ovox::generate_hiera_layers(
       $server_ovdb_config = {
         'puppet::server_reports'           => 'puppetdb',
         'puppet::server_storeconfigs'      => true,
-        'puppet::server::puppetdb::server' =>
+        # (2026-08-25) Not using puppet::server::puppetdb because it
+        # currently wraps puppetdb::master::config and we're using the
+        # openvoxdb module instead...
+        'openvoxdb::master::config::puppetdb_server'     =>
           ovox::get_ovdb_address($target_map),
+        # Also, these are false because theforeman-puppet is managing
+        # them...
+        'openvoxdb::master::config::manage_storeconfigs' => false,
+        'openvoxdb::master::config::restart_puppet'      => false,
+        # This uses an openvoxdb type/provider puppetdb_conn_validation
+        # which uses ssl and trips over the bolt puppet environment
+        # not having the ca cert.
+        'openvoxdb::master::config::strict_validation'   => false,
       }
       $ovdb_base_config = {
         'openvoxdb::server::database_host' =>
@@ -65,7 +94,7 @@ function ovox::generate_hiera_layers(
       }
       $ovdb_credentials_config = $managed_postgres ? {
         true    => {
-          'openvoxdb::server::postgresql::postgresql_ssl_on' => true,
+          'openvoxdb::server::postgresql_ssl_on' => true,
         },
         default => {}
       }
@@ -74,7 +103,7 @@ function ovox::generate_hiera_layers(
 
     $postgres_config = $managed_postgres ? {
       true    => {
-        'openvoxdb::database::postgresql::listen_address'    =>
+        'openvoxdb::database::postgresql::listen_addresses'    =>
           ovox::get_postgres_address($target_map),
         'openvoxdb::database::postgresql::postgres_version'  =>
           $postgres_version,
@@ -93,6 +122,7 @@ function ovox::generate_hiera_layers(
     $compiler_config = ovox::has_compilers($target_map) ? {
       true    =>  {
         'puppet::ca_server' => $ca_server,
+        'puppet::server'    => true,
         'puppet::server_ca' => false,
       },
       default => {},
@@ -103,6 +133,7 @@ function ovox::generate_hiera_layers(
     "${hiera_cluster_dir}/ovox.yaml" =>
       $profile_flags +
         $common_config +
+        $server_config +
         $server_ovdb_config +
         $ovdb_config +
         $postgres_config,
