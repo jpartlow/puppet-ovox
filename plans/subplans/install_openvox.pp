@@ -68,6 +68,8 @@ plan ovox::subplans::install_openvox(
   }
   $all_targets = ovox::all_agent_targets($target_map)
 
+  wait_until_available($all_targets, { 'wait_time' => 30 })
+
   $agent_version_results = run_plan(
     'ovox::subplans::install_component',
     'targets'  => $all_targets,
