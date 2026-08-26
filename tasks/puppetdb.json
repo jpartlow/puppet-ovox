@@ -1,0 +1,14 @@
+{
+  "description": "Invoke the openvoxdb cli",
+  "input_method": "stdin",
+  "files": [
+    "ruby_task_helper/files/task_helper.rb",
+    "ovox/lib/ovox/task_dispatch.rb"
+  ],
+  "parameters": {
+    "command": {
+      "type": "Enum[ssl-setup]",
+      "description": "Action to take with the openvoxdb command."
+    }
+  }
+}
