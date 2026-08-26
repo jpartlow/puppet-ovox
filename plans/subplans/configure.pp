@@ -151,9 +151,24 @@ plan ovox::subplans::configure(
     # (in a simple primary, the above relations are handled in the class itself)
     $role_map['primary'] + $role_map['compiler'] + $role_map['compiler_lb']
   ].map() |$targets| {
-    apply($targets) {
-      # The role var has been set in the Target.vars.
-      include("ov_role::${role}")
+    if !$targets.empty() {
+      $apply_resultset = apply($targets, '_catch_errors' => true) {
+        # The role var has been set in the Target.vars.
+        include("ov_role::${role}")
+      }
+      if !$apply_resultset.ok() {
+        out::message("Successful catalog runs:")
+        $apply_resultset.ok_set().each |$ar| {
+          ovox::log_apply_report($ar)
+        }
+        out::message("Failed catalog runs:")
+        $apply_resultset.error_set().each |$ar| {
+          ovox::log_apply_report($ar)
+          out::message("Failure: ${ar.error()}")
+        }
+        fail_plan($apply_resultset.error_set()[0].error())
+      }
+      $apply_resultset
     }
   }
 #  out::message($apply_results)
