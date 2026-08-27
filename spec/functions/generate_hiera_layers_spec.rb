@@ -70,6 +70,8 @@ describe 'ovox::generate_hiera_layers' do
       {
         "#{hiera_cluster_dir}/ovox.yaml" => instance_of(Hash),
         "#{hiera_cluster_dir}/role/compiler.yaml" => {},
+        "#{hiera_cluster_dir}/role/compiler_lb.yaml" => {},
+        "#{hiera_cluster_dir}/role/ovdb_lb.yaml" => {},
       }
     )
     expect(hiera_map["#{hiera_cluster_dir}/ovox.yaml"]).to match(
@@ -91,6 +93,8 @@ describe 'ovox::generate_hiera_layers' do
       {
         "#{hiera_cluster_dir}/ovox.yaml" => instance_of(Hash),
         "#{hiera_cluster_dir}/role/compiler.yaml" => {},
+        "#{hiera_cluster_dir}/role/compiler_lb.yaml" => {},
+        "#{hiera_cluster_dir}/role/ovdb_lb.yaml" => {},
       }
     )
     expect(hiera_map["#{hiera_cluster_dir}/ovox.yaml"]).to match(
@@ -119,6 +123,8 @@ describe 'ovox::generate_hiera_layers' do
       {
         "#{hiera_cluster_dir}/ovox.yaml" => instance_of(Hash),
         "#{hiera_cluster_dir}/role/compiler.yaml" => compiler_config,
+        "#{hiera_cluster_dir}/role/compiler_lb.yaml" => instance_of(Hash),
+        "#{hiera_cluster_dir}/role/ovdb_lb.yaml" => {},
       }
     )
     expect(hiera_map["#{hiera_cluster_dir}/ovox.yaml"]).to match(
@@ -133,6 +139,14 @@ describe 'ovox::generate_hiera_layers' do
         'ov_profile::postgres::additional_ovdb_servers' => [],
       }.merge(common_config),
     )
+    expect(hiera_map["#{hiera_cluster_dir}/role/compiler_lb.yaml"]).to match(
+      {
+        'ov_profile::lb::members' => {
+          'compiler1.spec' => /10\.[0-9.]+/,
+          'compiler2.spec' => /10\.[0-9.]+/,
+        }
+      }
+    )
   end
 
   it 'returns hiera config for a large arch' do
@@ -146,6 +160,8 @@ describe 'ovox::generate_hiera_layers' do
       {
         "#{hiera_cluster_dir}/ovox.yaml" => instance_of(Hash),
         "#{hiera_cluster_dir}/role/compiler.yaml" => compiler_config,
+        "#{hiera_cluster_dir}/role/compiler_lb.yaml" => instance_of(Hash),
+        "#{hiera_cluster_dir}/role/ovdb_lb.yaml" => {},
       }
     )
     expect(hiera_map["#{hiera_cluster_dir}/ovox.yaml"]).to match(
@@ -159,6 +175,14 @@ describe 'ovox::generate_hiera_layers' do
         'ov_profile::postgres::additional_ovdb_servers' => [],
       }.merge(common_config),
     )
+    expect(hiera_map["#{hiera_cluster_dir}/role/compiler_lb.yaml"]).to match(
+      {
+        'ov_profile::lb::members' => {
+          'compiler1.spec' => /10\.[0-9.]+/,
+          'compiler2.spec' => /10\.[0-9.]+/,
+        }
+      }
+    )
   end
 
   it 'returns hiera config for a huge arch' do
@@ -171,7 +195,9 @@ describe 'ovox::generate_hiera_layers' do
     expect(hiera_map).to match(
       {
         "#{hiera_cluster_dir}/ovox.yaml" => instance_of(Hash),
-        "#{hiera_cluster_dir}/role/compiler.yaml" => compiler_config
+        "#{hiera_cluster_dir}/role/compiler.yaml" => compiler_config,
+        "#{hiera_cluster_dir}/role/compiler_lb.yaml" => instance_of(Hash),
+        "#{hiera_cluster_dir}/role/ovdb_lb.yaml" => instance_of(Hash)
       }
     )
     expect(hiera_map["#{hiera_cluster_dir}/ovox.yaml"]).to match(
@@ -185,6 +211,22 @@ describe 'ovox::generate_hiera_layers' do
         'openvoxdb::server::database_host' => 'postgres.spec',
         'ov_profile::postgres::additional_ovdb_servers' => ['ovdb2.spec'],
       }.merge(common_config),
+    )
+    expect(hiera_map["#{hiera_cluster_dir}/role/compiler_lb.yaml"]).to match(
+      {
+        'ov_profile::lb::members' => {
+          'compiler1.spec' => /10\.[0-9.]+/,
+          'compiler2.spec' => /10\.[0-9.]+/,
+        }
+      }
+    )
+    expect(hiera_map["#{hiera_cluster_dir}/role/ovdb_lb.yaml"]).to match(
+      {
+        'ov_profile::lb::members' => {
+          'ovdb1.spec' => /10\.[0-9.]+/,
+          'ovdb2.spec' => /10\.[0-9.]+/,
+        }
+      }
     )
   end
 
@@ -202,7 +244,9 @@ describe 'ovox::generate_hiera_layers' do
     expect(hiera_map).to match(
       {
         "#{hiera_cluster_dir}/ovox.yaml" => instance_of(Hash),
-        "#{hiera_cluster_dir}/role/compiler.yaml" => compiler_config
+        "#{hiera_cluster_dir}/role/compiler.yaml" => compiler_config,
+        "#{hiera_cluster_dir}/role/compiler_lb.yaml" => instance_of(Hash),
+        "#{hiera_cluster_dir}/role/ovdb_lb.yaml" => {}
       }
     )
     expect(hiera_map["#{hiera_cluster_dir}/ovox.yaml"]).to match(
@@ -215,6 +259,14 @@ describe 'ovox::generate_hiera_layers' do
        .merge(server_config)
        .merge(ovdb_common_config)
        .merge(ovdb_server_common_config),
+    )
+    expect(hiera_map["#{hiera_cluster_dir}/role/compiler_lb.yaml"]).to match(
+      {
+        'ov_profile::lb::members' => {
+          'compiler1.spec' => /10\.[0-9.]+/,
+          'compiler2.spec' => /10\.[0-9.]+/,
+        }
+      }
     )
   end
 
@@ -233,6 +285,8 @@ describe 'ovox::generate_hiera_layers' do
         {
           "#{hiera_cluster_dir}/ovox.yaml" => instance_of(Hash),
           "#{hiera_cluster_dir}/role/compiler.yaml" => {},
+          "#{hiera_cluster_dir}/role/compiler_lb.yaml" => {},
+          "#{hiera_cluster_dir}/role/ovdb_lb.yaml" => {},
         }
       )
       expect(hiera_map["#{hiera_cluster_dir}/ovox.yaml"]).to match(
@@ -264,6 +318,8 @@ describe 'ovox::generate_hiera_layers' do
         {
           "#{hiera_cluster_dir}/ovox.yaml" => instance_of(Hash),
           "#{hiera_cluster_dir}/role/compiler.yaml" => {},
+          "#{hiera_cluster_dir}/role/compiler_lb.yaml" => {},
+          "#{hiera_cluster_dir}/role/ovdb_lb.yaml" => {},
         }
       )
       expect(hiera_map["#{hiera_cluster_dir}/ovox.yaml"]).to match(

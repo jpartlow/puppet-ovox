@@ -50,6 +50,10 @@ function ovox::generate_hiera_layers(
     $ovdb_config        = {}
     $postgres_config    = {}
     $compiler_config    = {}
+    $lb_configs           = {
+      'compiler' => {},
+      'ovdb'     => {},
+    }
   } else {
     $managed_postgres = !$target_map['postgres_targets'].empty()
 
@@ -127,6 +131,24 @@ function ovox::generate_hiera_layers(
       },
       default => {},
     }
+
+
+    $lb_configs = [
+      'compiler',
+      'ovdb',
+    ].reduce({}) |$config,$role| {
+      $has_lbs = !$target_map["${role}_lb_targets"].empty()
+      $lb_members = $target_map["${role}_targets"]
+      $lb_config = $has_lbs ? {
+        true    => {
+          'ov_profile::lb::members' => $lb_members.reduce({}) |$ac,$m| {
+            $ac + { $m.name() => $m.facts()['networking']['ip'] }
+          }
+        },
+        default => {},
+      }
+      $config + { $role => $lb_config }
+    }
   }
 
   $hiera_layers = {
@@ -139,6 +161,10 @@ function ovox::generate_hiera_layers(
         $postgres_config,
     "${hiera_cluster_dir}/role/compiler.yaml" =>
       $compiler_config,
+    "${hiera_cluster_dir}/role/compiler_lb.yaml" =>
+      $lb_configs['compiler'],
+    "${hiera_cluster_dir}/role/ovdb_lb.yaml" =>
+      $lb_configs['ovdb'],
   }
 
   $hiera_layers

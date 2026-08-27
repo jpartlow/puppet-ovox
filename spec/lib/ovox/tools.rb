@@ -6,7 +6,15 @@ module Ovox
 
     def a_target(name)
       Bolt::Target.from_hash(
-        { 'uri' => name },
+        {
+          'uri' => name,
+          'facts' => {
+            'networking' => {
+              # sufficiently unique
+              'ip' => "10.#{rand(255)}.#{rand(255)}.#{rand(255)}",
+            },
+          },
+        },
         inventory
       )
     end

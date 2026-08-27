@@ -161,12 +161,20 @@ plan ovox::subplans::configure(
       if !$apply_resultset.ok() {
         out::message("Successful catalog runs:")
         $apply_resultset.ok_set().each |$ar| {
+          $t = $ar.target()
+          $role = $t.vars()['role']
+          out::message("\nReport for successful ${role} role ${t}:\n")
           ovox::log_apply_report($ar)
+          out::message("\n---")
         }
         out::message("Failed catalog runs:")
         $apply_resultset.error_set().each |$ar| {
+          $t = $ar.target()
+          $role = $t.vars()['role']
+          out::message("\nReport for failed ${role} role ${t}:\n")
           ovox::log_apply_report($ar)
-          out::message("Failure: ${ar.error()}")
+          out::message("\nFailure for ${t}: ${ar.error()}")
+          out::message("\n---")
         }
         fail_plan($apply_resultset.error_set()[0].error())
       }

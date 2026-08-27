@@ -1,2 +1,3 @@
-# empty
-{}
+---
+# Do not start the agent service during install plan apply runs.
+'puppet::runmode': 'unmanaged'
