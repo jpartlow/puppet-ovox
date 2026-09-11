@@ -80,6 +80,9 @@
 #   openvox-server certificates. The compiler_pool_address will be added
 #   automatically if it exists (set or calculated from
 #   $compiler_lb_hosts).
+# @param capture_apply_reports If set to true, writes apply result
+#   output to a module local ./reports director during the configure
+#   stage so the reports can be reviewed for debugging.
 plan ovox::install(
   String[1]  $cluster_id,
 
@@ -124,6 +127,7 @@ plan ovox::install(
   # TODO: puppet.conf parameters?
   # TODO: agent service end state?
   # ???
+  Boolean $capture_apply_reports             = false,
 ) {
 
   $target_map = run_plan('ovox::subplans::validate_architecture',
@@ -160,11 +164,12 @@ plan ovox::install(
 
   # Configure openvox services/Install PostgreSQL
   run_plan('ovox::subplans::configure',
-    'cluster_id'           => $cluster_id,
-    'target_map'           => $target_map,
-    'postgres_version'     => $postgres_version,
-    'postgres_credentials' => $postgres_credentials,
-    'dns_alt_names'        => $dns_alt_names,
+    'cluster_id'            => $cluster_id,
+    'target_map'            => $target_map,
+    'postgres_version'      => $postgres_version,
+    'postgres_credentials'  => $postgres_credentials,
+    'dns_alt_names'         => $dns_alt_names,
+    'capture_apply_reports' => $capture_apply_reports,
   )
 
   # Post-tests?

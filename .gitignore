@@ -7,5 +7,6 @@
 bolt-debug.log
 Gemfile.lock
 Puppetfile
-/spec/fixtures/modules
 /data/cluster/
+/reports
+/spec/fixtures/modules

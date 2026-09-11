@@ -44,6 +44,10 @@
 # @param hiera_data_dir Without overwriting ./hiera.yaml, this must
 #   be the module relative data/ directory. Generally this parameter
 #   is only used internally in spec testing.
+# @param capture_apply_reports If set to true, writes apply result
+#   output to a module local ./reports director during the configure
+#   stage so the reports can be reviewed for debugging. Files are
+#   separated by cluster_id and timestamp.
 plan ovox::subplans::configure(
   String[1] $cluster_id,
   Ovox::TargetMap $target_map,
@@ -54,6 +58,8 @@ plan ovox::subplans::configure(
   Boolean $agent_service_running = true,
   Boolean $agent_service_enabled = true,
   String[1] $hiera_data_dir = 'ovox/../data',
+  Boolean $capture_apply_reports = false,
+  String[1] $reports_dir = 'ovox/../reports',
 ) {
   ##############################################
   # Setup targets and derive architecture roles.
@@ -158,6 +164,56 @@ plan ovox::subplans::configure(
         # The role var has been set in the Target.vars.
         include("ov_role::${role}")
       }
+
+      if $capture_apply_reports {
+        $reports_root = find_file($reports_dir)
+        $now = Timestamp()
+        $ts_str = $now.strftime('%Y-%m-%dT%H.%M.%S.%L')
+        $cluster_reports = "${reports_dir}/${cluster_id}/${ts_str}"
+        out::message("Saving apply results to: ${cluster_reports}")
+        run_command("mkdir -p '${cluster_reports}'", 'localhost')
+        $apply_resultset.results().each |$ar| {
+          $target = $ar.target()
+          $target_dir = "${cluster_reports}/${target}"
+          run_command("mkdir '${target_dir}'", 'localhost')
+          file::write(
+            "${target_dir}/apply-result.${target}.json",
+            stdlib::to_json_pretty($ar.to_data())
+          )
+          $report = $ar.report()
+          if $report =~ NotUndef {
+            file::write(
+              "${target_dir}/report.${target}.json",
+              stdlib::to_json_pretty($report)
+            )
+          }
+          $catalog = $ar.catalog()
+          if $catalog =~ NotUndef {
+            file::write(
+              "${target_dir}/catalog.${target}.json",
+              stdlib::to_json_pretty($report)
+            )
+          }
+          $error = $ar.error()
+          if $error =~ NotUndef {
+            file::write(
+              "${target_dir}/error.${target}.json",
+              stdlib::to_json_pretty(
+                {
+                  'message' => $error.message,
+                  'kind'    => $error.kind,
+                  'details' => $error.details,
+                }
+              )
+            )
+          }
+          file::write(
+            "${target_dir}/message.${target}",
+            "$ar.message()\n"
+          )
+        }
+      }
+
       if !$apply_resultset.ok() {
         out::message("Successful catalog runs:")
         $apply_resultset.ok_set().each |$ar| {
@@ -178,6 +234,7 @@ plan ovox::subplans::configure(
         }
         fail_plan($apply_resultset.error_set()[0].error())
       }
+
       $apply_resultset
     }
   }
