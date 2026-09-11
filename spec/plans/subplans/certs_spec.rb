@@ -13,6 +13,8 @@ describe 'plan: ovox::subplans::certs' do
 
   it 'runs' do
     allow_apply
+    expect_command('systemctl reload puppetserver')
+      .with_targets(primary)
     expect_task('ovox::puppet_ssl').
       with_targets([compiler1, compiler2]).
       with_params(
@@ -46,6 +48,8 @@ describe 'plan: ovox::subplans::certs' do
 
   it 'runs with empty targets' do
     allow_apply
+    expect_command('systemctl reload puppetserver')
+      .with_targets(primary)
     expect_out_message
 
     params['targets'] = []
@@ -56,6 +60,8 @@ describe 'plan: ovox::subplans::certs' do
 
   it 'performs puppetdb ssl-setup' do
     allow_apply
+    expect_command('systemctl reload puppetserver')
+      .with_targets(primary)
     expect_out_message
     expect_task('ovox::puppetdb').
       with_targets(ovdb1).
