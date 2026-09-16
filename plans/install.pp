@@ -76,10 +76,14 @@
 # @param ovdb_pool_address Same as compiler_pool_address, but for the
 #   $ovdb_hosts array. This is only relevant if there is more than one
 #   entry in $ovdb_hosts.
-# @param dns_alt_names Any additional hostnames to add to
+# @param compiler_dns_alt_names Any additional hostnames to add to
 #   openvox-server certificates. The compiler_pool_address will be added
 #   automatically if it exists (set or calculated from
 #   $compiler_lb_hosts).
+# @param ovdb_dns_alt_names Any additional hostnames to add to
+#   openvoxdb certificates. The ovdb_pool_address will be added
+#   automatically if it exists (set or calculated from
+#   $ovdb_lb_hosts).
 # @param capture_apply_reports If set to true, writes apply result
 #   output to a module local ./reports director during the configure
 #   stage so the reports can be reviewed for debugging.
@@ -120,7 +124,8 @@ plan ovox::install(
   Optional[Hash] $postgres_credentials       = undef,
   Optional[String[1]] $compiler_pool_address = undef,
   Optional[String[1]] $ovdb_pool_address     = undef,
-  Optional[Array[String[1]]] $dns_alt_names  = undef,
+  Optional[Array[String[1]]] $compiler_dns_alt_names  = undef,
+  Optional[Array[String[1]]] $ovdb_dns_alt_names      = undef,
   # TODO: puppet-r10k parameters
   # TODO: CA parameters?
   # TODO: CSR parameters?
@@ -164,12 +169,13 @@ plan ovox::install(
 
   # Configure openvox services/Install PostgreSQL
   run_plan('ovox::subplans::configure',
-    'cluster_id'            => $cluster_id,
-    'target_map'            => $target_map,
-    'postgres_version'      => $postgres_version,
-    'postgres_credentials'  => $postgres_credentials,
-    'dns_alt_names'         => $dns_alt_names,
-    'capture_apply_reports' => $capture_apply_reports,
+    'cluster_id'             => $cluster_id,
+    'target_map'             => $target_map,
+    'postgres_version'       => $postgres_version,
+    'postgres_credentials'   => $postgres_credentials,
+    'compiler_dns_alt_names' => $compiler_dns_alt_names,
+    'ovdb_dns_alt_names'     => $ovdb_dns_alt_names,
+    'capture_apply_reports'  => $capture_apply_reports,
   )
 
   # Post-tests?

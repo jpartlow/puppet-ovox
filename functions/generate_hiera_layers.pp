@@ -12,14 +12,24 @@
 #   data.
 # @param base_config Hash of additional configuration data needed to
 #   generate the hiera data.
+#
+#   * `postgres_version` - The version of Postgresql to install on
+#   postgres nodes.
+#   * `additional_sans_map` - Hash of additional SANs for Puppet
+#   dns_alt_names setting keyed by role.
 function ovox::generate_hiera_layers(
   Ovox::TargetMap $target_map,
   Stdlib::AbsolutePath $hiera_cluster_dir,
-  Hash $base_config,
+  Struct[{
+    Optional[postgres_version]    => Optional[Ovox::Postgres_version],
+    Optional[additional_sans_map] => Ovox::SansMap,
+  }] $base_config,
 ) >> Hash[Stdlib::AbsolutePath,Hash] {
   $primary = $target_map['primary_targets'][0]
 
   $postgres_version = $base_config['postgres_version']
+  $additional_sans_map = pick($base_config['additional_sans_map'], {})
+
   $ca_server = ($primary =~ NotUndef) ? {
     true    => $primary.name(),
     default => undef,
@@ -45,11 +55,12 @@ function ovox::generate_hiera_layers(
 
   if ($architecture == 'ambiguous') or
      ($architecture == 'error') {
-    $server_config      = {}
-    $server_ovdb_config = {}
-    $ovdb_config        = {}
-    $postgres_config    = {}
-    $compiler_config    = {}
+    $server_config        = {}
+    $server_ovdb_config   = {}
+    $ovdb_config          = {}
+    $postgres_config      = {}
+    $compiler_role_config = {}
+    $ovdb_role_config     = {}
     $lb_configs           = {
       'compiler' => {},
       'ovdb'     => {},
@@ -123,15 +134,31 @@ function ovox::generate_hiera_layers(
       default => {},
     }
 
-    $compiler_config = ovox::has_compilers($target_map) ? {
-      true    =>  {
-        'puppet::ca_server' => $ca_server,
-        'puppet::server'    => true,
-        'puppet::server_ca' => false,
+    $ovdb_sans = ovox::compile_sans_for(
+      'ovdb',
+      $target_map,
+      $additional_sans_map,
+    )
+    $ovdb_role_config = $ovdb_sans.empty() ? {
+      false   => {
+        'puppet::dns_alt_names' => $ovdb_sans,
       },
       default => {},
     }
 
+    $compiler_role_config = ovox::has_compilers($target_map) ? {
+      true    =>  {
+        'puppet::ca_server'     => $ca_server,
+        'puppet::server'        => true,
+        'puppet::server_ca'     => false,
+        'puppet::dns_alt_names' => ovox::compile_sans_for(
+          'compiler',
+          $target_map,
+          $additional_sans_map,
+        ),
+      },
+      default => {},
+    }
 
     $lb_configs = [
       'compiler',
@@ -160,7 +187,9 @@ function ovox::generate_hiera_layers(
         $ovdb_config +
         $postgres_config,
     "${hiera_cluster_dir}/role/compiler.yaml" =>
-      $compiler_config,
+      $compiler_role_config,
+    "${hiera_cluster_dir}/role/ovdb.yaml" =>
+      $ovdb_role_config,
     "${hiera_cluster_dir}/role/compiler_lb.yaml" =>
       $lb_configs['compiler'],
     "${hiera_cluster_dir}/role/ovdb_lb.yaml" =>

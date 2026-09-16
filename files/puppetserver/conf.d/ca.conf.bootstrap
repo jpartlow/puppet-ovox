@@ -1,0 +1,3 @@
+"certificate-authority": {
+  "allow-subject-alt-names": true
+}

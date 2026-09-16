@@ -38,6 +38,10 @@ describe 'plan: ovox::subplans::configure' do
     when nil
       # agents need ca_server set
       params['puppet_conf']['main']['ca_server'] = primary.host()
+    when 'compiler'
+      params['puppet_conf']['main']['dns_alt_names'] = clb.host()
+    when 'ovdb'
+      params['puppet_conf']['main']['dns_alt_names'] = ovdblb.host()
     else
       # do nothing
     end
@@ -64,6 +68,8 @@ describe 'plan: ovox::subplans::configure' do
       allow_out_message
       expect_command("mkdir -p #{cluster_hiera_dir}/role").
         with_targets('localhost')
+      expect_upload('ovox/puppetserver/conf.d/ca.conf.bootstrap')
+        .with_targets([primary])
       expect_plan('ovox::subplans::certs').
         with_params(
           {
@@ -169,6 +175,8 @@ describe 'plan: ovox::subplans::configure' do
       expect_task('openvox_bootstrap::configure').
         with_targets([ovdblb]).
         with_params(configure_params(primary, 'ovdb_lb'))
+      expect_upload('ovox/puppetserver/conf.d/ca.conf.bootstrap')
+        .with_targets([primary])
       expect_plan('ovox::subplans::certs').
         with_params(
           {

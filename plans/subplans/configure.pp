@@ -28,8 +28,14 @@
 #   infrastructure being installed. Defines the local hiera data
 #   hierarchy for the cluster under ./data/cluster/${cluster_id}.
 # @param target_map The Ovox::TargetMap for the cluster.
-# @param dns_alt_names Additional subject alternative names to be
-#   added to the primary or compiler certs via puppet.conf.
+# @param compiler_dns_alt_names Any additional hostnames to add to
+#   openvox-server certificates. The compiler_pool_address will be added
+#   automatically if it exists (set or calculated from
+#   $compiler_lb_hosts).
+# @param ovdb_dns_alt_names Any additional hostnames to add to
+#   openvoxdb certificates. The ovdb_pool_address will be added
+#   automatically if it exists (set or calculated from
+#   $ovdb_lb_hosts).
 # @param postgres_version Overwrite the PostgreSQL version to be
 #   installed by the postgresql module.
 # @param postgres_credentials TODO: credential hash for configuring
@@ -51,7 +57,8 @@
 plan ovox::subplans::configure(
   String[1] $cluster_id,
   Ovox::TargetMap $target_map,
-  Array[String[1]] $dns_alt_names = [],
+  Array[String[1]] $compiler_dns_alt_names = [],
+  Array[String[1]] $ovdb_dns_alt_names = [],
   Optional[Ovox::Postgres_version] $postgres_version = undef,
   Hash $postgres_credentials = {},
   Boolean $setup_infra_control_repo = true,
@@ -73,6 +80,10 @@ plan ovox::subplans::configure(
   $non_primary_infra = $infrastructure_targets - [$primary]
 
   $role_map = ovox::derive_role_map($target_map)
+  $additional_sans_map = {
+    'compiler' => $compiler_dns_alt_names,
+    'ovdb'     => $ovdb_dns_alt_names,
+  }
 
   # Store the role class of each infrastructure node.
   $infrastructure_targets.each() |$t| {
@@ -89,7 +100,8 @@ plan ovox::subplans::configure(
     $target_map,
     $hiera_cluster_dir,
     {
-      'postgres_version' => $postgres_version,
+      'postgres_version'    => $postgres_version,
+      'additional_sans_map' => $additional_sans_map,
     }
   )
 
@@ -108,23 +120,35 @@ plan ovox::subplans::configure(
   #########################################################
   # Configure puppet.conf and csr for infrastructure nodes.
 
-  # TODO: dns_alt_names
-
   $infra_configure_results = run_task_with('openvox_bootstrap::configure',
     $infrastructure_targets
   ) |$target| {
+    $role = $target.vars['role']
+    $dns_alt_names = ovox::compile_sans_for(
+      $role,
+      $target_map,
+      $additional_sans_map,
+    )
+    $sans_parameter = $dns_alt_names.empty() ? {
+      false   => {
+        'dns_alt_names' => $dns_alt_names.join(','),
+      },
+      default => {},
+    }
+    $main = {
+      'server' => $primary.name(),
+    } + $sans_parameter
+
     $task_params = {
       # NOTE: This is not redundant with the later theforeman-puppet
       # apply managing puppet.conf, because the ovox::subplans::cert
       # invocations of puppet ssl also need the server set...
       'puppet_conf' => {
-        'main' => {
-          'server' => $primary.name(),
-        },
+        'main' => $main,
       },
       'csr_attributes' => {
         'extension_requests' => {
-          'pp_role' => $target.vars['role'],
+          'pp_role' => $role,
         }
       },
       'puppet_service_running' => false,
@@ -134,6 +158,18 @@ plan ovox::subplans::configure(
     $task_params
   }
 #  out::message($infra_configure_results)
+
+  ################################################
+  # Configure puppetserver for certificate signing
+
+  # Ensure allow-subject-alt-names is true for cert generation.
+  # This temporary ca.conf will be overwritten by puppet-puppet
+  # during the later apply stage.
+  upload_file(
+    'ovox/puppetserver/conf.d/ca.conf.bootstrap',
+    '/etc/puppetlabs/puppetserver/conf.d/ca.conf',
+    $primary,
+  )
 
   ###################################
   # Sign infrastructure certificates.
