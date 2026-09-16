@@ -183,16 +183,42 @@ plan ovox::subplans::configure(
   #################################
   # Apply roles to nodes in stages.
 
+  $first_ovdb_node =
+    (Array($role_map['ovdb'][0], true)).filter |$i| { $i =~ NotUndef }
+  $rest_of_ovdb_nodes = (
+      Array($role_map['ovdb'][1,-1], true)
+  ).filter |$i| { $i =~ NotUndef }
+
   $apply_results = [
+    # postgres
+    #
     # postgres should be up before openvoxdb since the later
     # needs the database configured before it can perform migrations
     $role_map['postgres'],
+    # openvoxdb
+    #
     # openvoxdb should be up before openvox-servers since the
     # classes for configuring server for ovdb perform a status check
     # on ovdb first
-    $role_map['ovdb'] + $role_map['ovdb_lb'],
+    #
+    # Additionally, however, when we have multiple openvoxdb nodes (in
+    # a huge architecture, for example), there is a race by the
+    # openvoxdb instances to populate postgres with their schema.
+    # The process is well-behaved in the sense that only one succeeds,
+    # and the database is initialized properly, but if run in
+    # parallel, the loosing ovdb nodes will tend to fail their initial
+    # startup as postgres will return an error for attempts to enter
+    # duplicate schema rows. They will succeed in subsequent runs.
+    #
+    # To avoid this, apply the first ovdb node separately.
+    $first_ovdb_node,
+    # Then apply the rest of them...and everything should still
+    # configure in one plan execution.
+    $rest_of_ovdb_nodes + $role_map['ovdb_lb'],
+    # Note: in a simple primary, the above relations are handled in
+    # the class itself
+    #
     # primary and compilers
-    # (in a simple primary, the above relations are handled in the class itself)
     $role_map['primary'] + $role_map['compiler'] + $role_map['compiler_lb']
   ].map() |$targets| {
     if !$targets.empty() {
