@@ -34,6 +34,13 @@ describe 'plan: ovox::subplans::configure' do
       'puppet_service_running' => false,
       'puppet_service_enabled' => true,
     }
+    case role
+    when nil
+      # agents need ca_server set
+      params['puppet_conf']['main']['ca_server'] = primary.host()
+    else
+      # do nothing
+    end
     params.merge!(
       {
         'csr_attributes' => {

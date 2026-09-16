@@ -251,7 +251,12 @@ plan ovox::subplans::configure(
     $agent_targets,
     'puppet_conf' => {
       'main' => {
-        'server' => $agent_server,
+        'server'    => $agent_server,
+        # openvox-server doesn't have a built in reverse proxy
+        # allowing compilers to proxy puppet-ca requests, so the basic
+        # solution is to have agents target the primary directly for
+        # ca requests.
+        'ca_server' => $primary.name(),
       },
     },
     'puppet_service_running' => false,
