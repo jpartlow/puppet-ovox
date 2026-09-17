@@ -5,24 +5,32 @@
 #
 # This plan basically runs through the following phases:
 #
-# 1. Configure puppet.conf and csr_attributes.yaml on infrastructure
+# 1. Targets are formally assigned a role
+# 2. Hiera configuration is written for $cluster_id in the local
+#    ./data/cluster dir
+# 3. Configure puppet.conf and csr_attributes.yaml on infrastructure
 #    nodes.
 #  * puppet server setting is set to the primary (principle
 #    openvox-server/ca node)
 #  * certificate extensions adds the role to the certificate to
 #    simplify future lookup of role per infrastructure node
-# 2. Hiera configuration is written for $cluster_id in the local
-#    ./data/cluster dir
-# 3. Each infrastructure node has the ov_role::${role} class applied
+# 4. Generate and sign infrastructure certificates
+# 5. Each infrastructure node has the ov_role::${role} class applied
 #    to it, with parameter data coming from the above hiera data
-# 4. If there are any exclusively agent targets, they get their
-#    puppet.conf server written to point to get_pool_address()
-# 5. TODO: If $setup_infra_control_repo is true, add a static
+# 6. If there are any exclusively agent targets, they get their
+#    puppet.conf server written to point to get_pool_address(),
+#    and set their caserver to the primary
+# 7. Generate and sign agent certificates, if any
+# 8. TODO: If $setup_infra_control_repo is true, add a static
 #    ovox-control control repo on the primary to continue to enforce the
 #    OpenVox configuration of infrastructure services
-# 6. Validate agent runs on all nodes
-# 7. Ensure agent service is set according to $agent_service_running
-#    and $agent_service_enabled.
+# 9. Validate agent runs on all nodes
+#    NOTE: purely for validation purposes, in medium, large and huge
+#    clusters that have compilers, an agent node is useful to validate
+#    that agents can successfully obtained catalogs from the
+#    compilers. All infrastructure catalogs come from the primary.
+# 10. Ensure agent service is set according to $agent_service_running
+#     and $agent_service_enabled.
 #
 # @param cluster_id Unique String identifying the cluster of OpenVox
 #   infrastructure being installed. Defines the local hiera data
@@ -349,6 +357,7 @@ plan ovox::subplans::configure(
   )
 #  out::message($agent_results)
 
+  ##############################################
   # Ensure agent service is started and enabled.
   $agent_service_results = run_task('openvox_bootstrap::configure',
     $all_targets,

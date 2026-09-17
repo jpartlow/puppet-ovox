@@ -3,6 +3,7 @@
 .resource_types
 .rerun.json
 .task_cache.json
+.yardoc
 .*.sw?
 bolt-debug.log
 Gemfile.lock

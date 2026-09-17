@@ -64,3 +64,6 @@ viable, but might not be the best choice architecturally.
 For example, a small primary could instead have postgres pulled out to
 its own node, but for scaling, you're more likely to benefit from
 adding compilers first...
+
+A simple example would be a custom 'split' architecture with three
+separate openvox-server, openvoxdb and postgresql nodes.
