@@ -6,6 +6,8 @@
 function ovox::has_postgres(
   Ovox::TargetMap $target_map
 ) >> Boolean {
+  # lint:ignore:strict_indent
   !($target_map['postgres_targets'].empty() and
     $target_map['unmanaged_postgres_hosts'].empty())
+  # lint:endignore
 }

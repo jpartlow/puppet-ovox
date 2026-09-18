@@ -16,7 +16,6 @@ function ovox::generate_target_map(
   Ovox::HostMap $host_map,
   Boolean       $manage_postgres,
 ) >> Ovox::TargetMap {
-
   # Obtain actual targets that we can perform reliable equality tests
   # on, rather than just Strings or inventory group name references.
   $primary_targets     = get_targets($host_map['primary_host'])

@@ -57,8 +57,9 @@ function ovox::generate_hiera_layers(
     'puppet::server_foreman'           => false,
   }
 
-  if ($architecture == 'ambiguous') or
-     ($architecture == 'error') {
+  if (
+    ($architecture == 'ambiguous') or ($architecture == 'error')
+  ) {
     $server_config        = {}
     $server_ovdb_config   = {}
     $ovdb_config          = {}
@@ -86,6 +87,7 @@ function ovox::generate_hiera_layers(
       default => {},
     }
 
+    # lint:ignore:manifest_whitespace_arrows_single_space_after
     if $target_map['ovdb_targets'].empty() {
       $server_ovdb_config = {}
       $ovdb_config        = {}
@@ -122,7 +124,7 @@ function ovox::generate_hiera_layers(
 
     $postgres_config = $managed_postgres ? {
       true    => {
-        'openvoxdb::database::postgresql::listen_addresses'    =>
+        'openvoxdb::database::postgresql::listen_addresses'  =>
           ovox::get_postgres_address($target_map),
         'openvoxdb::database::postgresql::postgres_version'  =>
           $postgres_version,
@@ -151,7 +153,7 @@ function ovox::generate_hiera_layers(
     }
 
     $compiler_role_config = ovox::has_compilers($target_map) ? {
-      true    =>  {
+      true => {
         'puppet::ca_server'     => $ca_server,
         'puppet::server'        => true,
         'puppet::server_ca'     => false,
@@ -174,7 +176,7 @@ function ovox::generate_hiera_layers(
         true    => {
           'ov_profile::lb::members' => $lb_members.reduce({}) |$ac,$m| {
             $ac + { $m.name() => $m.facts()['networking']['ip'] }
-          }
+          },
         },
         default => {},
       }
@@ -183,13 +185,15 @@ function ovox::generate_hiera_layers(
   }
 
   $hiera_layers = {
+    # lint:ignore:strict_indent
     "${hiera_cluster_dir}/ovox.yaml" =>
       $profile_flags +
-        $common_config +
-        $server_config +
-        $server_ovdb_config +
-        $ovdb_config +
-        $postgres_config,
+      $common_config +
+      $server_config +
+      $server_ovdb_config +
+      $ovdb_config +
+      $postgres_config,
+    # lint:endignore
     "${hiera_cluster_dir}/role/compiler.yaml" =>
       $compiler_role_config,
     "${hiera_cluster_dir}/role/ovdb.yaml" =>
@@ -199,6 +203,7 @@ function ovox::generate_hiera_layers(
     "${hiera_cluster_dir}/role/ovdb_lb.yaml" =>
       $lb_configs['ovdb'],
   }
+  # lint:endignore
 
   $hiera_layers
 }

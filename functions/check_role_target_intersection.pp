@@ -19,7 +19,7 @@ function ovox::check_role_target_intersection(
   }
   $role_targets = $role_map[$role]
   $others = $role_map.filter |$r, $_targets| { $r != $role }
-  $others.reduce([]) |$errors, $pair|  {
+  $others.reduce([]) |$errors, $pair| {
     $other_role = $pair[0]
     $other_targets = $pair[1]
     $conflicts = intersection($role_targets, $other_targets)

@@ -18,6 +18,7 @@
 function ovox::derive_profile_flags(
   Ovox::TargetMap $target_map,
 ) >> Hash[String,Boolean] {
+  # lint:ignore:manifest_whitespace_arrows_single_space_after
   $primary_flags = {
     'ov_role::primary::install_ovdb' =>
       ovox::role_includes('primary', 'ovdb', $target_map),
@@ -28,10 +29,11 @@ function ovox::derive_profile_flags(
   $ovdb_flags = ovox::has_separate_ovdbs($target_map) ? {
     true => {
       'ov_role::ovdb::install_postgres' =>
-        ovox::role_includes('ovdb', 'postgres', $target_map)
+        ovox::role_includes('ovdb', 'postgres', $target_map),
     },
     default => {},
   }
+  # lint:endignore
 
   $primary_flags + $ovdb_flags
 }

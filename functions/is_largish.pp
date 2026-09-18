@@ -9,7 +9,9 @@
 function ovox::is_largish(
   Ovox::TargetMap $target_map,
 ) >> Boolean {
+  # lint:ignore:strict_indent
   ovox::has_large_primary($target_map) and
     ! ovox::has_separate_ovdbs($target_map) and
     ovox::has_separate_postgres($target_map)
+  # lint:endignore
 }

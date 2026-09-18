@@ -13,6 +13,5 @@ function ovox::has_large_primary(
   $postgres_not_on_primary =
     ! ovox::role_includes('primary', 'postgres', $target_map)
 
-  $ovdb_on_primary and
-    $postgres_not_on_primary
+  $ovdb_on_primary and $postgres_not_on_primary
 }

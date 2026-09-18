@@ -32,10 +32,10 @@ function ovox::compile_sans_for(
       String: {
         [$e]
       }
-      Target: {
+      Target: { # lint:ignore:unquoted_string_in_case
         [$t.name()]
       }
-      Array[Target]: {
+      Array[Target]: { # lint:ignore:unquoted_string_in_case
         $e.map |$t| { $t.name() }
       }
       default: { $e }

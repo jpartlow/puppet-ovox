@@ -11,6 +11,8 @@ function ovox::get_architecture(
   Ovox::TargetMap $target_map,
 ) >> Ovox::Architectures {
   $info = ovox::validate_architecture($target_map)
+  # lint:ignore:2sp_soft_tabs
+  # lint:ignore:strict_indent
   if !$info['errors'].empty() {
     $architecture = 'error'
   } elsif !$info['ambiguities'].empty() {
@@ -43,5 +45,7 @@ function ovox::get_architecture(
   } else {
      $architecture = 'custom'
   }
+  # lint:endignore
+  # lint:endignore
   $architecture
 }

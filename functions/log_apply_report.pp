@@ -20,7 +20,7 @@ function ovox::log_apply_report(
     }
     $template = empty($l['file']) ? {
       true    => $t,
-      default => "$t\n  (%<file>s:%<line>s)",
+      default => "${t}\n  (%<file>s:%<line>s)",
     }
     $str = sprintf($template,
       {

@@ -27,7 +27,6 @@
 function ovox::validate_architecture(
   Ovox::TargetMap $target_map,
 ) >> Ovox::ArchErrors {
-
   ##########
   # Warnings
 
@@ -38,14 +37,16 @@ function ovox::validate_architecture(
       'No defined primary openvox-server targets.',
     ],
     [
-      !ovox::separate_ovdb_targets($target_map).empty() and
-        !intersection(
+      (
+        !ovox::separate_ovdb_targets($target_map).empty() and
+        (!intersection(
           $target_map['primary_targets'],
           $target_map['postgres_targets']
-        ).empty(),
+        ).empty())
+      ),
       @(EOS/L),
         Primary has postgresql, but openvoxdb is on a separate \
-        node(s). This is likely less efficient than moving postgresql
+        node(s). This is likely less efficient than moving postgresql \
         to a separate node.
         |- EOS
     ],
@@ -72,12 +73,12 @@ function ovox::validate_architecture(
     ],
     [
       (ovox::has_postgres($target_map) and
-        $target_map['ovdb_targets'].empty()),
+        $target_map['ovdb_targets'].empty()), # lint:ignore:strict_indent
       'Postgres nodes defined, but no openvoxdb nodes in cluster.',
     ],
     [
       (!$target_map['ovdb_targets'].empty() and
-        !ovox::has_postgres($target_map)) ,
+        !ovox::has_postgres($target_map)), # lint:ignore:strict_indent
       @(EOS/L),
         Openvoxdb nodes defined, but no Postgres nodes defined \
         or referenced, managed or unmanaged.
@@ -85,7 +86,7 @@ function ovox::validate_architecture(
     ],
     [
       (!$target_map['compiler_targets'].empty() and
-        (ovox::get_pool_address('compiler', $target_map) =~ Undef)),
+        (ovox::get_pool_address('compiler', $target_map) =~ Undef)), # lint:ignore:strict_indent
       @(EOS/L),
         Compilers defined, but no compiler load-balancer nodes \
         or compiler_pool_address is set.
@@ -93,7 +94,7 @@ function ovox::validate_architecture(
     ],
     [
       (($target_map['ovdb_targets'].count() > 1) and
-        (ovox::get_pool_address('ovdb', $target_map) =~ Undef)),
+        (ovox::get_pool_address('ovdb', $target_map) =~ Undef)), # lint:ignore:strict_indent
       @(EOS/L),
         Multiple Openvoxdb nodes defined, but no openvoxdb \
         load-balancer nodes or ovdb_pool_address is set.
@@ -104,7 +105,7 @@ function ovox::validate_architecture(
     # violate this constraint...
     [
       (!$target_map['postgres_targets'].empty() and
-       !$target_map['unmanaged_postgres_hosts'].empty()),
+        !$target_map['unmanaged_postgres_hosts'].empty()), # lint:ignore:strict_indent
       'Both internal and external PostgreSQL has been defined.',
     ],
   ].reduce([]) |$errors, $i| {
@@ -150,7 +151,7 @@ function ovox::validate_architecture(
       Ambiguity: Only some ${t1_label} targets (${t1}) are \
       also ${t2_label} targets (${t2}). ${t1_label} \
       targets must either be disjoint from ${t2_label} targets, \
-      or a subset of $t2_label} targets.
+      or a subset of ${t2_label} targets.
       |- EOS
     !$consistent_profiles ? {
       true    => $errors + $errmsg,
