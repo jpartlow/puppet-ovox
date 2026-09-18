@@ -125,8 +125,19 @@ jobs:
           vms: ${{ matrix.cluster.vms }}
       - name: Run bundler
         run: bundle install
+      - name: Install Bolt
+        shell: bash
+        env:
+          APT_REPOSITORY: apt.voxpupuli.org
+        run: |-
+          OS_MAJOR=$(bundle exec facter os.release.major)
+          RELEASE_PACKAGE="openvox8-release-ubuntu${OS_MAJOR}.deb"
+          wget https://${APT_REPOSITORY}/${RELEASE_PACKAGE}
+          sudo dpkg -i ${RELEASE_PACKAGE}
+          sudo apt update
+          sudo apt install -y openbolt
       - name: Install ovox modules
-        run: bundle exec bolt module install
+        run: /opt/puppetlabs/bin/bolt module install
       - name: Add kvm_automation_tooling to Bolt .modules
         # The kvm_automation_tooling module is itself a Bolt module
         # and it uses a tasks/resolve_reference.rb to extract uri
@@ -150,4 +161,4 @@ jobs:
         env:
           INVENTORY_FILE: ${{ format('kvm_automation_tooling/terraform/instances/inventory.{0}.yaml', matrix.cluster.id) }}
           PARAMS_FILE: ${{ format('params.{0}.json', matrix.cluster.id) }}
-        run: bundle exec bolt plan run ovox::install --inventory "${INVENTORY_FILE}" --params "@${PARAMS_FILE}"
+        run: /opt/puppetlabs/bin/bolt plan run ovox::install --inventory "${INVENTORY_FILE}" --params "@${PARAMS_FILE}"
