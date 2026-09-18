@@ -7,7 +7,7 @@ require 'rspec-puppet-facts'
 require 'ovox/tools'
 require 'ovox/shared_contexts'
 
-module KatRspec
+module OvoxRspec
   def self.fixture_path
     File.expand_path(File.join(__dir__, 'fixtures'))
   end
@@ -33,8 +33,8 @@ RSpec.configure do |c|
   # Include the Bolt .modules directory as part of the modulepath for
   # dependencies. Joined because rspec-puppet can only deal with a
   # multi-element modulepath as a string.
-  c.module_path     = KatRspec.modulepath.join(File::PATH_SEPARATOR)
-  c.manifest        = File.join(KatRspec.fixture_path, 'manifests', 'site.pp')
+  c.module_path     = OvoxRspec.modulepath.join(File::PATH_SEPARATOR)
+  c.manifest        = File.join(OvoxRspec.fixture_path, 'manifests', 'site.pp')
   c.environmentpath = File.join(Dir.pwd, 'spec', 'environments')
   c.facterdb_string_keys = true
   c.include(Ovox::SpecTools)
@@ -59,7 +59,7 @@ RSpec.shared_context 'plan_init' do
     # This bit of insanity is due to the fact that rspec-puppet can only
     # deal with a module:path, while BoltSpec can only deal with a
     # [module, path]...
-    RSpec.configuration.module_path = KatRspec.modulepath
+    RSpec.configuration.module_path = OvoxRspec.modulepath
     example.run
   ensure
     RSpec.configuration.module_path = old_modpath
