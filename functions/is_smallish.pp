@@ -3,6 +3,8 @@
 # no other openvoxdb or PostgreSQL targets in the cluster.
 #
 # @param target_map Ovox::TargetMap instance for the cluster.
+# @return
+#   True if cluster primary services match a small architecture.
 function ovox::is_smallish(
   Ovox::TargetMap $target_map,
 ) >> Boolean {

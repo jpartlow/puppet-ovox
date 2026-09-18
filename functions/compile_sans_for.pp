@@ -8,11 +8,14 @@
 #
 # Ensures that an array of strings is returned. May be empty.
 #
-# @param target The Target to compile sans for.
-# @param target_map The Ovox::TargetMap for the cluster the *target*
-#   is a part of.
-# @param additional_sans_by_role Hash for additional sans to include
-#   keyed by role.
+# @param role
+#   The architectural role to compile sans for.
+# @param target_map
+#   The Ovox::TargetMap for the cluster.
+# @param additional_sans_by_role
+#   Hash for additional sans to include keyed by role.
+# @return
+#   An array of SANs strings for the role.
 function ovox::compile_sans_for(
   Ovox::Roles $role,
   Ovox::TargetMap $target_map,
@@ -26,8 +29,12 @@ function ovox::compile_sans_for(
 
   $sans2 = $sans.reduce([]) |$ary,$e| {
     $stringified = case $e {
-      String: { [$e] }
-      Target: { [$t.name()] }
+      String: {
+        [$e]
+      }
+      Target: {
+        [$t.name()]
+      }
       Array[Target]: {
         $e.map |$t| { $t.name() }
       }

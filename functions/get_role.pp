@@ -4,9 +4,12 @@
 # Raises an error if the target maps to multiple roles, or if no role
 # is found at all.
 #
-# @param target The Target object to lookup in the role map.
-# @param role_map The Ovox::RoleMap for the cluster the $target is
-#   part of.
+# @param target
+#   The Target object to lookup in the role map.
+# @param role_map
+#   The Ovox::RoleMap for the cluster the $target is part of.
+# @return
+#   The target role.
 function ovox::get_role(
   Target $target,
   Ovox::RoleMap $role_map,

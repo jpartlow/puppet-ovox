@@ -3,6 +3,8 @@
 # nodes and either separate or unmanaged postgres nodes.
 #
 # @param target_map Ovox::TargetMap instance for the cluster.
+# @return
+#   True if cluster primary services match a huge architecture.
 function ovox::is_hugish(
   Ovox::TargetMap $target_map,
 ) >> Boolean {

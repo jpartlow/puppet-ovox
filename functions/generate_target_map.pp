@@ -4,12 +4,14 @@
 # configuration. This structure can then be interrogated by other
 # functions to determine topology/architecture of the cluster.
 #
-# @param host_map A hash of the host TargetSpecs provided for the
-#   cluster.
-# @param manage_postgres Flag for whether PostgreSQL (if
-#   postgres_hosts are present) is managed in the cluster or is just a
-#   host reference to an unmanaged PostgreSQL service outside of the
-#   cluster.
+# @param host_map
+#   A hash of the host TargetSpecs provided for the cluster.
+# @param manage_postgres
+#   Flag for whether PostgreSQL (if postgres_hosts are present) is
+#   managed in the cluster or is just a host reference to an unmanaged
+#   PostgreSQL service outside of the cluster.
+# @return
+#   An Ovox::TargetMap for the cluster.
 function ovox::generate_target_map(
   Ovox::HostMap $host_map,
   Boolean       $manage_postgres,

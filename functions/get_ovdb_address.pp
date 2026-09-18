@@ -1,5 +1,4 @@
-# Return the hostname of the Openvoxdb server that Openvox-servers
-# should be configured to communicate with.
+# Get the singular openvoxdb service address for the cluster.
 #
 # If there is a single configured openvoxdb server in the cluster,
 # that address will be returned. If there are multiple openvoxdb
@@ -9,6 +8,9 @@
 # Otherwise the function returns undef.
 #
 # @param target_map Ovox::TargetMap instance for the cluster.
+# @return
+#   The hostname of the openvoxdb server that openvox-servers
+#   should be configured to communicate with or undef.
 function ovox::get_ovdb_address(
   Ovox::TargetMap $target_map,
 ) >> Optional[String] {

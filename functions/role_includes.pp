@@ -8,10 +8,14 @@
 # This will return true if all primary targets will also have
 # openvoxdb installed and configured on them.
 #
-# @param role Role key for the set of targets in the cluster to test.
-# @param included_role Role key for the set of targets $role may also
-#   include.
-# @param target_map Ovox::TargetMap instance for the cluster.
+# @param role
+#   Role key for the set of targets in the cluster to test.
+# @param included_role
+#   Role key for the set of targets $role may also include.
+# @param target_map
+#   Ovox::TargetMap instance for the cluster.
+# @return
+#   True if $role targets are a subset of $included_role targets.
 function ovox::role_includes(
   Ovox::Roles $role,
   Ovox::Roles $included_role,

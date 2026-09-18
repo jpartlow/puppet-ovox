@@ -2,10 +2,13 @@
 # produce an array of error messages if any $role targets are present
 # in any other targets in the $role_map.
 #
-# @param role The role entry to test.
-# @param role_map A Hash keyed by role strings pointing to arrays of
+# @param role
+#   The role entry to test.
+# @param role_map
+#   A Hash keyed by role strings pointing to arrays of
 #   Targets, including the entry for $role itself.
-# @return An array of error messages for any detected role target
+# @return
+#   An array of error messages for any detected role target
 #   intersections.
 function ovox::check_role_target_intersection(
   String $role,

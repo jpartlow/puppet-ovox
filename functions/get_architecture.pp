@@ -6,6 +6,7 @@
 # 'error' values.
 #
 # @param target_map Ovox::TargetMap instance for the cluster.
+# @return An Ovox::Architectures string for the cluster.
 function ovox::get_architecture(
   Ovox::TargetMap $target_map,
 ) >> Ovox::Architectures {

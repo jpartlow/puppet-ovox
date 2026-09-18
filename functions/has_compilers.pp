@@ -2,6 +2,7 @@
 # targets.
 #
 # @param target_map Ovox::TargetMap instance for the cluster.
+# @return True if compiler hosts are set.
 function ovox::has_compilers(
   Ovox::TargetMap $target_map
 ) >> Boolean {

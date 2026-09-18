@@ -1,7 +1,10 @@
 # All nodes that need to be earmarked for agent installation so that
 # we can later manage them with OpenVox.
 #
-# @param target_map The TargetMap for the cluster.
+# @param target_map
+#   The TargetMap for the cluster.
+# @return
+#   An array of targets to install openvox-agent on.
 function ovox::all_agent_targets(
   Ovox::TargetMap $target_map,
 ) >> Array[Target] {

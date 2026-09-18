@@ -257,6 +257,9 @@ you will need to add custom hiera data ahead of time to get them
 configured such that the plan will succeed in the configuration phase.
 (see [Hiera](#hiera) below)
 
+See [Ovox::Architectures](./types/architectures.pp) for additional
+discussion of custom, ambiguous and error architectures.
+
 ## Hiera
 
 Each cluster's `$install::cluster_id` parameter defines a separate hiera
@@ -310,12 +313,14 @@ Platform testing will be done in Github Actions.
 
 ## Terms
 
-* **Primary** - The principal openvox-server node in the cluster that
+* **Primary** - The principal openvox-server host in the cluster that
   serves both as the certificate authority and compiler for
   **infrastructure** catalogs.
 * **Infrastructure Nodes** - Nodes in the cluster that provide openvox
   services. As opposed to the agent fleet that gets catalogs from the
   openvox infrastructure.
+* **Compiler** - An openvox-server host that serves to scale out
+  catalog compilation for the agent fleet.
 
 ## Reference
 
@@ -337,8 +342,17 @@ To run the specs:
 
 * wire up flag to ignore ambiguity warnings for non-interactive
   workflows
+* lb needs configurable maxconn for front and backends.
+* secure pdb comms
+  * puppetdbs should have an allowlist for the nodes that connect to
+    them (ovlbs, compilers, primary)
 * r10k integration
 * wire up configuration needed to access unmanaged postgres
+* (maybe?) ovdb lb simple status health check via ssl.
+* determine other core configuration parameters to wire through from
+  install plan parameters, versus configuration that should be left to
+  manual hiera `./data/cluster/%{cluster_id}/custom` overrides for
+  edge cases.
 * puppet_operational_dashboards
 * frontends
 * tuning

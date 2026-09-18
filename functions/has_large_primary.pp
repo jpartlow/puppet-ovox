@@ -3,6 +3,8 @@
 # services managed on it.
 #
 # @param target_map Ovox::TargetMap instance for the cluster.
+# @return
+#   True for a large architecture primary.
 function ovox::has_large_primary(
   Ovox::TargetMap $target_map
 ) >> Boolean {

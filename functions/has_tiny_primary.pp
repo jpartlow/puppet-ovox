@@ -1,7 +1,8 @@
-# Given a TargetMap, returns true if the primary just as the
+# Given a TargetMap, returns true if the primary just has the
 # openvox-server service.
 #
 # @param target_map Ovox::TargetMap instance for the cluster.
+# @return True for a tiny architecture primary.
 function ovox::has_tiny_primary(
   Ovox::TargetMap $target_map
 ) >> Boolean {

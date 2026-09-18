@@ -62,6 +62,9 @@
 #   output to a module local ./reports director during the configure
 #   stage so the reports can be reviewed for debugging. Files are
 #   separated by cluster_id and timestamp.
+# @param reports_dir The directory to write apply result output two if
+#   *capture_apply_reports* is set. By default this will write to a
+#   module relative ./reports directory.
 plan ovox::subplans::configure(
   String[1] $cluster_id,
   Ovox::TargetMap $target_map,

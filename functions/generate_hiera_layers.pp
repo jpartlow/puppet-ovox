@@ -1,4 +1,4 @@
-# Return a Hash of hiera configuration based on an
+# Generate a Hash of hiera configuration based on an
 # evaluation of the given $target_map and $base_config.
 #
 # The returned hash is keyed by the absolute path to the hiera file
@@ -7,16 +7,20 @@
 #
 # The function does not touch the file system itself.
 #
-# @param target_map Ovox::TargetMap instance for the cluster.
-# @param hiera_cluster_dir The root directory for this cluster's hiera
+# @param target_map
+#   Ovox::TargetMap instance for the cluster.
+# @param hiera_cluster_dir
+#   The root directory for this cluster's hiera data.
+# @param base_config
+#   Hash of additional configuration data needed to generate the hiera
 #   data.
-# @param base_config Hash of additional configuration data needed to
-#   generate the hiera data.
 #
 #   * `postgres_version` - The version of Postgresql to install on
 #   postgres nodes.
 #   * `additional_sans_map` - Hash of additional SANs for Puppet
 #   dns_alt_names setting keyed by role.
+# @return
+#   A Hash of hiera data hashes keyed by file path.
 function ovox::generate_hiera_layers(
   Ovox::TargetMap $target_map,
   Stdlib::AbsolutePath $hiera_cluster_dir,

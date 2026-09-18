@@ -7,6 +7,11 @@
 #   configuration roles used by applies.
 # @param primary_host The primary openvox-server host and certificate
 #   authority.
+#
+#   NOTE: This may be an array, but more than one host will result in
+#   an ambiguous architecture...see the README.md and
+#   functions/validate_architecture.pp for details of what *ambiguous*
+#   means in this context.
 # @param ovdb_hosts Array of openvoxdb hosts. By default, this is just
 #   the $primary_host. If set to an empty array, no openvoxdb instance
 #   will be installed in the cluster.
@@ -14,20 +19,32 @@
 #   Defaults to the $primary_host. If set to an empty array, no
 #   Postgresql hosts will be installed in the cluster.
 #
+#   NOTE: More than one postgres host will be *ambiguous*...
+#
 #   NOTE: to use a separate postgres instance like a pre-configured
 #   cloud instance, set postgres_hosts to the cloud instance so that
 #   ovdbs are configured to talk to it, and set $manage_postgres to
-#   false. See also $postgres_credentials.
+#   false. See also $postgres_credentials (TODO).
 # @param compiler_hosts Array of openvox-server compiler hosts.
 # @param compiler_lb_hosts Array of haproxy load-balancers for the
 #   compiler hosts.
+#
+#   NOTE: More than one compiler_lb is not necessarily ambiguous, but
+#   only the first host in the array will be used to set agent server
+#   settings. Configuring fail over or dns for multiple load balancers
+#   is out of scope for this module.
 # @param ovdb_lb_hosts Array of haproxy load-balancers for the ovdb
-#   hosts.
-# @param agent_hosts Array of additional agents to provision.
-#   Note, the agent will also be installed on all of the above
-#   server, compiler, compiler lbs, ovdb lbs, ovdb and postgres hosts,
-#   with the possible exception of $postgres_hosts if
-#   $manage_postgres is false.
+#   hosts. (more than one *ovdb_lb_hosts* has the same caveat as for
+#   *compiler_lb_hosts*...)
+# @param agent_hosts Array of additional non-infrastructure agents to
+#   provision. Note that the agent will also be installed on all of
+#   the above server, compiler, compiler lbs, ovdb lbs, ovdb and
+#   postgres hosts, with the possible exception of $postgres_hosts if
+#   $manage_postgres is false, regardless of this setting.
+#
+#   The principal utility of adding *agent_hosts* is to validate that
+#   catalog compilation through the compiler load balancer is
+#   successful before plan completion.
 # @param openvox_collection String determining the over arching
 #   version group for the openvox packages. If only openvox_collection
 #   is set, then all installed openvox packages will be the latest
@@ -58,13 +75,13 @@
 #   instance) that will be handling database queries on behalf of the
 #   cluster.
 #
-#   If instead the desired configuration is just a simple
-#   $primary_host that only has openvox-server installed, set
+#   If instead the desired configuration is just a simple (*tiny*
+#   arch) $primary_host that only has openvox-server installed, set
 #   $ovdb_hosts and $postgres_hosts to empty arrays.
 # @param postgres_credentials Hash of credentials for connecting to a
 #   pre-configured postgres host. For example, $postgres_hosts set to a
 #   cloud instance, $manage_postgres set to false).
-#   TODO: actual structure...
+#   TODO: actual structure and wiring it up...
 # @param compiler_pool_address If more than one $compiler_lb_hosts is
 #   defined, this should be set to the general host address for reaching
 #   the pool. The default is the first entry in $compiler_lb_hosts.

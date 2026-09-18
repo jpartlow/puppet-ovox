@@ -4,6 +4,8 @@
 # configured from outside the cluster.
 #
 # @param target_map Ovox::TargetMap instance for the cluster.
+# @return
+#   True if cluster primary services match a tiny architecture.
 function ovox::is_tinyish(
   Ovox::TargetMap $target_map,
 ) >> Boolean {

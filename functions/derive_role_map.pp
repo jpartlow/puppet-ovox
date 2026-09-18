@@ -1,7 +1,10 @@
 # Return a RoleMap linking the ov_role classes to the
 # array of targets they will be applied to in the cluster.
 #
-# @param target_map Ovox::TargetMap instance for the cluster.
+# @param target_map
+#   Ovox::TargetMap instance for the cluster.
+# @return
+#   An Ovox::RoleMap for the cluster.
 function ovox::derive_role_map(
   Ovox::TargetMap $target_map,
 ) >> Ovox::RoleMap {

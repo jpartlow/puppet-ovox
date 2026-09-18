@@ -4,6 +4,8 @@
 # cluster.
 #
 # @param target_map Ovox::TargetMap instance for the cluster.
+# @return
+#   True if cluster primary services match a large architecture.
 function ovox::is_largish(
   Ovox::TargetMap $target_map,
 ) >> Boolean {

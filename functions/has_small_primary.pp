@@ -2,6 +2,7 @@
 # openvox-server, openvoxdb and PostgreSQL Services managed on it.
 #
 # @param target_map Ovox::TargetMap instance for the cluster.
+# @return True for a small architecture primary.
 function ovox::has_small_primary(
   Ovox::TargetMap $target_map
 ) >> Boolean {

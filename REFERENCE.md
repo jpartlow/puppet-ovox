@@ -9,15 +9,15 @@
 * [`ovox::all_agent_targets`](#ovox--all_agent_targets): All nodes that need to be earmarked for agent installation so that we can later manage them with OpenVox.
 * [`ovox::check_role_target_intersection`](#ovox--check_role_target_intersection): Given a $role that is in a $role_map Hash of $role => $targets, produce an array of error messages if any $role targets are present in any ot
 * [`ovox::compile_sans_for`](#ovox--compile_sans_for): Aggregate all of the dns_alt_name (subject alternative names) for the given role into a single array of strings without duplicates.  By *role
-* [`ovox::derive_profile_flags`](#ovox--derive_profile_flags): Return a map of profile flags based on cluster TargetMap.  Intended to populate hiera data to inform key primary and ovdb roles as to which p
+* [`ovox::derive_profile_flags`](#ovox--derive_profile_flags): Generate a map of profile flags based on cluster TargetMap.  Intended to populate hiera data to inform key primary and ovdb roles as to which
 * [`ovox::derive_role_map`](#ovox--derive_role_map): Return a RoleMap linking the ov_role classes to the array of targets they will be applied to in the cluster.
-* [`ovox::disjoint`](#ovox--disjoint): True if there is no intersection of elements between the given arrays.
-* [`ovox::generate_hiera_layers`](#ovox--generate_hiera_layers): Return a Hash of hiera configuration based on an evaluation of the given $target_map and $base_config.  The returned hash is keyed by the abs
+* [`ovox::disjoint`](#ovox--disjoint): Determine if given arrays are disjoint.
+* [`ovox::generate_hiera_layers`](#ovox--generate_hiera_layers): Generate a Hash of hiera configuration based on an evaluation of the given $target_map and $base_config.  The returned hash is keyed by the a
 * [`ovox::generate_target_map`](#ovox--generate_target_map): Given the host TargetSpecs for the cluster and the boolean flag for whether postgres is managed, returns an Ovox::TargetMap structure with al
 * [`ovox::get_architecture`](#ovox--get_architecture): Given a TargetMap, perform some hueristics and return the appropriate architecture label from Ovox::Architectures.  see docs/architectures.md
-* [`ovox::get_ovdb_address`](#ovox--get_ovdb_address): Return the hostname of the Openvoxdb server that Openvox-servers should be configured to communicate with.  If there is a single configured o
-* [`ovox::get_pool_address`](#ovox--get_pool_address): Return the hostname for the requested load-balancer pool.  This will either be the String given to the install plan for the respective pool_a
-* [`ovox::get_postgres_address`](#ovox--get_postgres_address): Return the address to the PostgreSQL server that Openvoxdb instances should connect to.  If there are no postgres_targets, it will return the
+* [`ovox::get_ovdb_address`](#ovox--get_ovdb_address): Get the singular openvoxdb service address for the cluster.  If there is a single configured openvoxdb server in the cluster, that address wi
+* [`ovox::get_pool_address`](#ovox--get_pool_address): This will either be the String given to the install plan for the respective pool_address field, or the hostname of the first load-balancer ta
+* [`ovox::get_postgres_address`](#ovox--get_postgres_address): Get the address to the PostgreSQL server that Openvoxdb instances should connect to.  This function does not address complex configuration sc
 * [`ovox::get_role`](#ovox--get_role): Return the exact role the given $target is assigned to based on the information in the given Ovox::RoleMap.  Raises an error if the target ma
 * [`ovox::has_compilers`](#ovox--has_compilers): Given a TargetMap, returns true if the cluster has compiler targets.
 * [`ovox::has_large_primary`](#ovox--has_large_primary): Given a TargetMap, returns true if the primary has openvox-server and openvoxdb services, but not PostgreSQL services managed on it.
@@ -25,7 +25,7 @@
 * [`ovox::has_separate_ovdbs`](#ovox--has_separate_ovdbs): Given a TargetMap, returns true if the cluster has openvoxdb services that are not on the primary.
 * [`ovox::has_separate_postgres`](#ovox--has_separate_postgres): Given a TargetMap, returns true if the cluster has postgres services that are not on the primary.  This could be either cluster nodes with Po
 * [`ovox::has_small_primary`](#ovox--has_small_primary): Given a TargetMap, returns true if the primary has openvox-server, openvoxdb and PostgreSQL Services managed on it.
-* [`ovox::has_tiny_primary`](#ovox--has_tiny_primary): Given a TargetMap, returns true if the primary just as the openvox-server service.
+* [`ovox::has_tiny_primary`](#ovox--has_tiny_primary): Given a TargetMap, returns true if the primary just has the openvox-server service.
 * [`ovox::is_hugish`](#ovox--is_hugish): Given a TargetMap, returns true if the primary has only openvox-server, and the cluster has separate openvoxdb nodes and either separate or u
 * [`ovox::is_largish`](#ovox--is_largish): Given a TargetMap, returns true if the primary has only openvox-server and openvoxdb services, the cluster has a separate postgres node or ex
 * [`ovox::is_smallish`](#ovox--is_smallish): Given a TargetMap, returns true if the primary has all three openvox-server, openvoxdb and PostgreSQL services, and there are no other openvo
@@ -34,8 +34,8 @@
 * [`ovox::role_includes`](#ovox--role_includes): Tests whether all targets of the given $role are also targets of the $included_role.  Example:    role_includes('primary', 'ovdb')  This will
 * [`ovox::separate_ovdb_targets`](#ovox--separate_ovdb_targets): Returns an array of openvoxdb targets to manage that are not the primary openvox-server target.
 * [`ovox::separate_postgres_targets`](#ovox--separate_postgres_targets): Returns an array of PostgreSQL targets to manage that are not the primary openvox-server target and not a separate openvoxdb target.
-* [`ovox::subset_of`](#ovox--subset_of): True if first array's elements are all contained within the second array.
-* [`ovox::test_results`](#ovox--test_results): This function is used in do_until loops to log errors from a result set while returning the overall status of the result for the loop. It's a
+* [`ovox::subset_of`](#ovox--subset_of): Test whether the first array's elements are a subset of the second array.
+* [`ovox::test_results`](#ovox--test_results): This function is used in do_until loops to log errors from a result set while returning the overall status of the result for the loop.  It's 
 * [`ovox::transform_openvox_host_version_results`](#ovox--transform_openvox_host_version_results): Transform the PlanResult ResultSet of package version hashes returned by the ovox::subplans::install_component plan into a Hash of host names
 * [`ovox::validate_architecture`](#ovox--validate_architecture): Validate the given cluster TargetMap for architectural and role errors and return an array of any errors found.  There are constraints to wha
 * [`ovox::validate_openvox_version_parameters`](#ovox--validate_openvox_version_parameters): Validates the given set of OpenVox install parameters and raises an error for any problems.  If we're installing a released version, then col
@@ -85,7 +85,7 @@ we can later manage them with OpenVox.
 All nodes that need to be earmarked for agent installation so that
 we can later manage them with OpenVox.
 
-Returns: `Array[Target]`
+Returns: `Array[Target]` An array of targets to install openvox-agent on.
 
 ##### `target_map`
 
@@ -149,7 +149,7 @@ sans found in *additional_sans_by_role*.
 
 Ensures that an array of strings is returned. May be empty.
 
-Returns: `Array[String[1]]`
+Returns: `Array[String[1]]` An array of SANs strings for the role.
 
 ##### `role`
 
@@ -167,14 +167,13 @@ The Ovox::TargetMap for the cluster.
 
 Data type: `Ovox::SansMap`
 
-Hash for additional sans to include
-keyed by role.
+Hash for additional sans to include keyed by role.
 
 ### <a name="ovox--derive_profile_flags"></a>`ovox::derive_profile_flags`
 
 Type: Puppet Language
 
-Return a map of profile flags based on cluster TargetMap.
+Generate a map of profile flags based on cluster TargetMap.
 
 Intended to populate hiera data to inform key primary and ovdb roles
 as to which profiles to include for this cluster.
@@ -189,7 +188,7 @@ All other cases are ambiguous, and require manual configuration.
 
 #### `ovox::derive_profile_flags(Ovox::TargetMap $target_map)`
 
-Return a map of profile flags based on cluster TargetMap.
+Generate a map of profile flags based on cluster TargetMap.
 
 Intended to populate hiera data to inform key primary and ovdb roles
 as to which profiles to include for this cluster.
@@ -202,7 +201,7 @@ not have postgres.
 
 All other cases are ambiguous, and require manual configuration.
 
-Returns: `Hash[String,Boolean]`
+Returns: `Hash[String,Boolean]` A Hash of profile flags to be included in cluster hiera data.
 
 ##### `target_map`
 
@@ -222,7 +221,7 @@ array of targets they will be applied to in the cluster.
 Return a RoleMap linking the ov_role classes to the
 array of targets they will be applied to in the cluster.
 
-Returns: `Ovox::RoleMap`
+Returns: `Ovox::RoleMap` An Ovox::RoleMap for the cluster.
 
 ##### `target_map`
 
@@ -234,15 +233,14 @@ Ovox::TargetMap instance for the cluster.
 
 Type: Puppet Language
 
-True if there is no intersection of elements between the given
-arrays.
+Determine if given arrays are disjoint.
 
 #### `ovox::disjoint(Array $first, Array $second)`
 
-True if there is no intersection of elements between the given
-arrays.
+Determine if given arrays are disjoint.
 
-Returns: `Boolean`
+Returns: `Boolean` True if there is no intersection of elements between the given
+arrays.
 
 ##### `first`
 
@@ -260,7 +258,7 @@ The second array.
 
 Type: Puppet Language
 
-Return a Hash of hiera configuration based on an
+Generate a Hash of hiera configuration based on an
 evaluation of the given $target_map and $base_config.
 
 The returned hash is keyed by the absolute path to the hiera file
@@ -274,7 +272,7 @@ The function does not touch the file system itself.
     Optional[additional_sans_map] => Ovox::SansMap,
   }] $base_config)`
 
-Return a Hash of hiera configuration based on an
+Generate a Hash of hiera configuration based on an
 evaluation of the given $target_map and $base_config.
 
 The returned hash is keyed by the absolute path to the hiera file
@@ -283,7 +281,7 @@ caller.
 
 The function does not touch the file system itself.
 
-Returns: `Hash[Stdlib::AbsolutePath,Hash]`
+Returns: `Hash[Stdlib::AbsolutePath,Hash]` A Hash of hiera data hashes keyed by file path.
 
 ##### `target_map`
 
@@ -295,8 +293,7 @@ Ovox::TargetMap instance for the cluster.
 
 Data type: `Stdlib::AbsolutePath`
 
-The root directory for this cluster's hiera
-data.
+The root directory for this cluster's hiera data.
 
 ##### `base_config`
 
@@ -309,8 +306,8 @@ Struct[{
   }]
 ```
 
-Hash of additional configuration data needed to
-generate the hiera data.
+Hash of additional configuration data needed to generate the hiera
+data.
 
 * `postgres_version` - The version of Postgresql to install on
 postgres nodes.
@@ -335,23 +332,21 @@ with all the computed Target arrays for installation and
 configuration. This structure can then be interrogated by other
 functions to determine topology/architecture of the cluster.
 
-Returns: `Ovox::TargetMap`
+Returns: `Ovox::TargetMap` An Ovox::TargetMap for the cluster.
 
 ##### `host_map`
 
 Data type: `Ovox::HostMap`
 
-A hash of the host TargetSpecs provided for the
-cluster.
+A hash of the host TargetSpecs provided for the cluster.
 
 ##### `manage_postgres`
 
 Data type: `Boolean`
 
-Flag for whether PostgreSQL (if
-postgres_hosts are present) is managed in the cluster or is just a
-host reference to an unmanaged PostgreSQL service outside of the
-cluster.
+Flag for whether PostgreSQL (if postgres_hosts are present) is
+managed in the cluster or is just a host reference to an unmanaged
+PostgreSQL service outside of the cluster.
 
 ### <a name="ovox--get_architecture"></a>`ovox::get_architecture`
 
@@ -373,7 +368,7 @@ see docs/architectures.md for a description of the named architectures.
 see types/architectures.pp for notes on 'custom', 'ambiguous' and
 'error' values.
 
-Returns: `Ovox::Architectures`
+Returns: `Ovox::Architectures` An Ovox::Architectures string for the cluster.
 
 ##### `target_map`
 
@@ -385,8 +380,7 @@ Ovox::TargetMap instance for the cluster.
 
 Type: Puppet Language
 
-Return the hostname of the Openvoxdb server that Openvox-servers
-should be configured to communicate with.
+Get the singular openvoxdb service address for the cluster.
 
 If there is a single configured openvoxdb server in the cluster,
 that address will be returned. If there are multiple openvoxdb
@@ -397,8 +391,7 @@ Otherwise the function returns undef.
 
 #### `ovox::get_ovdb_address(Ovox::TargetMap $target_map)`
 
-Return the hostname of the Openvoxdb server that Openvox-servers
-should be configured to communicate with.
+Get the singular openvoxdb service address for the cluster.
 
 If there is a single configured openvoxdb server in the cluster,
 that address will be returned. If there are multiple openvoxdb
@@ -407,7 +400,8 @@ will be returned.
 
 Otherwise the function returns undef.
 
-Returns: `Optional[String]`
+Returns: `Optional[String]` The hostname of the openvoxdb server that openvox-servers
+should be configured to communicate with or undef.
 
 ##### `target_map`
 
@@ -419,8 +413,6 @@ Ovox::TargetMap instance for the cluster.
 
 Type: Puppet Language
 
-Return the hostname for the requested load-balancer pool.
-
 This will either be the String given to the install plan for the
 respective pool_address field, or the hostname of the first
 load-balancer target in the TargetMap for the given pool.
@@ -429,15 +421,13 @@ May return `undef` if neither is defined.
 
 #### `ovox::get_pool_address(Ovox::LbPools $pool, Ovox::TargetMap $target_map)`
 
-Return the hostname for the requested load-balancer pool.
-
 This will either be the String given to the install plan for the
 respective pool_address field, or the hostname of the first
 load-balancer target in the TargetMap for the given pool.
 
 May return `undef` if neither is defined.
 
-Returns: `Optional[String]`
+Returns: `Optional[String]` The hostname for the requested load-balancer pool or undef.
 
 ##### `pool`
 
@@ -455,35 +445,35 @@ Ovox::TargetMap instance for the cluster.
 
 Type: Puppet Language
 
-Return the address to the PostgreSQL server that Openvoxdb instances
+Get the address to the PostgreSQL server that Openvoxdb instances
 should connect to.
-
-If there are no postgres_targets, it will return the first
-unmanaged_postgres_host entry.
-
-Otherwise, the first postgres_target address will be returned.
-
-It may return undef if no postgres host information is configured.
 
 This function does not address complex configuration scenarios with
 multiple postgres targets.
+
+It returns the first *postgres_targets* entry.
+
+If there are no *postgres_targets*, it will return the first
+*unmanaged_postgres_hosts* entry.
+
+It may return undef if no postgres host information is configured.
 
 #### `ovox::get_postgres_address(Ovox::TargetMap $target_map)`
 
-Return the address to the PostgreSQL server that Openvoxdb instances
+Get the address to the PostgreSQL server that Openvoxdb instances
 should connect to.
-
-If there are no postgres_targets, it will return the first
-unmanaged_postgres_host entry.
-
-Otherwise, the first postgres_target address will be returned.
-
-It may return undef if no postgres host information is configured.
 
 This function does not address complex configuration scenarios with
 multiple postgres targets.
 
-Returns: `Optional[String]`
+It returns the first *postgres_targets* entry.
+
+If there are no *postgres_targets*, it will return the first
+*unmanaged_postgres_hosts* entry.
+
+It may return undef if no postgres host information is configured.
+
+Returns: `Optional[String]` The Postgresql service address for the cluster or undef.
 
 ##### `target_map`
 
@@ -509,7 +499,7 @@ information in the given Ovox::RoleMap.
 Raises an error if the target maps to multiple roles, or if no role
 is found at all.
 
-Returns: `Ovox::Roles`
+Returns: `Ovox::Roles` The target role.
 
 ##### `target`
 
@@ -521,8 +511,7 @@ The Target object to lookup in the role map.
 
 Data type: `Ovox::RoleMap`
 
-The Ovox::RoleMap for the cluster the $target is
-part of.
+The Ovox::RoleMap for the cluster the $target is part of.
 
 ### <a name="ovox--has_compilers"></a>`ovox::has_compilers`
 
@@ -536,7 +525,7 @@ targets.
 Given a TargetMap, returns true if the cluster has compiler
 targets.
 
-Returns: `Boolean`
+Returns: `Boolean` True if compiler hosts are set.
 
 ##### `target_map`
 
@@ -558,7 +547,7 @@ Given a TargetMap, returns true if the primary has
 openvox-server and openvoxdb services, but not PostgreSQL
 services managed on it.
 
-Returns: `Boolean`
+Returns: `Boolean` True for a large architecture primary.
 
 ##### `target_map`
 
@@ -578,7 +567,7 @@ services defined, either internally or as an external reference.
 Given a TargetMap, returns true if the cluster has some PostgreSQL
 services defined, either internally or as an external reference.
 
-Returns: `Boolean`
+Returns: `Boolean` True if postgres services are defined.
 
 ##### `target_map`
 
@@ -598,7 +587,7 @@ services that are not on the primary.
 Given a TargetMap, returns true if the cluster has openvoxdb
 services that are not on the primary.
 
-Returns: `Boolean`
+Returns: `Boolean` True if some openvoxdb service hosts are not the primary.
 
 ##### `target_map`
 
@@ -624,7 +613,7 @@ postgres services that are not on the primary.
 This could be either cluster nodes with PostgreSQL managed by the
 module, or some external unmanaged PostgreSQL service in the cloud.
 
-Returns: `Boolean`
+Returns: `Boolean` True if some Postgresql services are not the primary.
 
 ##### `target_map`
 
@@ -644,7 +633,7 @@ openvox-server, openvoxdb and PostgreSQL Services managed on it.
 Given a TargetMap, returns true if the primary has
 openvox-server, openvoxdb and PostgreSQL Services managed on it.
 
-Returns: `Boolean`
+Returns: `Boolean` True for a small architecture primary.
 
 ##### `target_map`
 
@@ -656,15 +645,15 @@ Ovox::TargetMap instance for the cluster.
 
 Type: Puppet Language
 
-Given a TargetMap, returns true if the primary just as the
+Given a TargetMap, returns true if the primary just has the
 openvox-server service.
 
 #### `ovox::has_tiny_primary(Ovox::TargetMap $target_map)`
 
-Given a TargetMap, returns true if the primary just as the
+Given a TargetMap, returns true if the primary just has the
 openvox-server service.
 
-Returns: `Boolean`
+Returns: `Boolean` True for a tiny architecture primary.
 
 ##### `target_map`
 
@@ -686,7 +675,7 @@ Given a TargetMap, returns true if the primary has only
 openvox-server, and the cluster has separate openvoxdb
 nodes and either separate or unmanaged postgres nodes.
 
-Returns: `Boolean`
+Returns: `Boolean` True if cluster primary services match a huge architecture.
 
 ##### `target_map`
 
@@ -710,7 +699,7 @@ and openvoxdb services, the cluster has a separate postgres node or
 external service, but there are no additional openvoxdb nodes in the
 cluster.
 
-Returns: `Boolean`
+Returns: `Boolean` True if cluster primary services match a large architecture.
 
 ##### `target_map`
 
@@ -732,7 +721,7 @@ Given a TargetMap, returns true if the primary has all three
 openvox-server, openvoxdb and PostgreSQL services, and there are
 no other openvoxdb or PostgreSQL targets in the cluster.
 
-Returns: `Boolean`
+Returns: `Boolean` True if cluster primary services match a small architecture.
 
 ##### `target_map`
 
@@ -756,7 +745,7 @@ with just openvox-server, and there are no separate openvoxdb
 or PostgreSQL nodes in the cluster, and no unmanaged PostgreSQL
 configured from outside the cluster.
 
-Returns: `Boolean`
+Returns: `Boolean` True if cluster primary services match a tiny architecture.
 
 ##### `target_map`
 
@@ -774,13 +763,13 @@ Log the report from an ApplyResult in a human readable format.
 
 Log the report from an ApplyResult in a human readable format.
 
-Returns: `Any`
+Returns: `Any` True on completion.
 
 ##### `ar`
 
 Data type: `ApplyResult`
 
-
+The ApplyResult to log.
 
 ### <a name="ovox--role_includes"></a>`ovox::role_includes`
 
@@ -808,7 +797,7 @@ Example:
 This will return true if all primary targets will also have
 openvoxdb installed and configured on them.
 
-Returns: `Boolean`
+Returns: `Boolean` True if $role targets are a subset of $included_role targets.
 
 ##### `role`
 
@@ -820,8 +809,7 @@ Role key for the set of targets in the cluster to test.
 
 Data type: `Ovox::Roles`
 
-Role key for the set of targets $role may also
-include.
+Role key for the set of targets $role may also include.
 
 ##### `target_map`
 
@@ -841,7 +829,7 @@ primary openvox-server target.
 Returns an array of openvoxdb targets to manage that are not the
 primary openvox-server target.
 
-Returns: `Array[Target]`
+Returns: `Array[Target]` Array of ovdb targets that are not the primary.
 
 ##### `target_map`
 
@@ -861,7 +849,8 @@ primary openvox-server target and not a separate openvoxdb target.
 Returns an array of PostgreSQL targets to manage that are not the
 primary openvox-server target and not a separate openvoxdb target.
 
-Returns: `Array[Target]`
+Returns: `Array[Target]` Array of postgres targets that are not the primary or ovdb
+targets.
 
 ##### `target_map`
 
@@ -873,15 +862,16 @@ The TargetMap for the cluster.
 
 Type: Puppet Language
 
-True if first array's elements are all contained within the second
+Test whether the first array's elements are a subset of the second
 array.
 
 #### `ovox::subset_of(Array $candidate, Array $collection)`
 
-True if first array's elements are all contained within the second
+Test whether the first array's elements are a subset of the second
 array.
 
-Returns: `Boolean`
+Returns: `Boolean` True if *candidate*'s elements are all contained within the
+*collection*.
 
 ##### `candidate`
 
@@ -899,19 +889,21 @@ Proposed superset of the candidate array.
 
 Type: Puppet Language
 
-This function is used in do_until loops to log errors from a result set
-while returning the overall status of the result for the loop. It's
-a workaround for the fact that we can't get the final result set
-outside of the loop.
+This function is used in do_until loops to log errors from a result
+set while returning the overall status of the result for the loop.
+
+It's a workaround for the fact that we can't get the final result
+set outside of the loop.
 
 #### `ovox::test_results(String $message, ResultSet $results)`
 
-This function is used in do_until loops to log errors from a result set
-while returning the overall status of the result for the loop. It's
-a workaround for the fact that we can't get the final result set
-outside of the loop.
+This function is used in do_until loops to log errors from a result
+set while returning the overall status of the result for the loop.
 
-Returns: `Boolean` Boolean true if none of the results had errors.
+It's a workaround for the fact that we can't get the final result
+set outside of the loop.
+
+Returns: `Boolean` True if none of the results had errors.
 
 ##### `message`
 
@@ -934,11 +926,17 @@ Transform the PlanResult ResultSet of package version hashes
 returned by the ovox::subplans::install_component
 plan into a Hash of host names to package version hashes.
 
+These hoops are being jumped in service of displaying useful package
+version output to during plan execution.
+
 #### `ovox::transform_openvox_host_version_results(String $package, PlanResult $results, Hash $initial = {})`
 
 Transform the PlanResult ResultSet of package version hashes
 returned by the ovox::subplans::install_component
 plan into a Hash of host names to package version hashes.
+
+These hoops are being jumped in service of displaying useful package
+version output to during plan execution.
 
 Returns: `Hash[String, Hash[String, String]]` A Hash mapping host names to Hashes mapping package names to
 package versions.
@@ -947,8 +945,7 @@ package versions.
 
 Data type: `String`
 
-The name of the package whose version is being
-transformed.
+The name of the package whose version is being transformed.
 
 ##### `results`
 
@@ -986,6 +983,9 @@ The function returns three classes of issues:
 * Errors, which reflect structural problems preventing
   classification of the given cluster nodes into discrete roles.
 
+This function does not raise any errors itself, merely returns
+information about them.
+
 #### `ovox::validate_architecture(Ovox::TargetMap $target_map)`
 
 Validate the given cluster TargetMap for architectural and role
@@ -1007,7 +1007,11 @@ The function returns three classes of issues:
 * Errors, which reflect structural problems preventing
   classification of the given cluster nodes into discrete roles.
 
-Returns: `Ovox::ArchErrors`
+This function does not raise any errors itself, merely returns
+information about them.
+
+Returns: `Ovox::ArchErrors` An Ovox::ArchErrors structure with warnings, ambiguities and
+errors for the caller.
 
 ##### `target_map`
 
@@ -1041,8 +1045,8 @@ raised.
 If we're installing a pre-release version, then the version
 must be explicit, not 'latest', and collection is ignored.
 
-Returns: `Ovox::Openvox_install_params` Ovox::Openvox_install_params with
-openvox_collection updated to match version as necessary.
+Returns: `Ovox::Openvox_install_params` Ovox::Openvox_install_params with openvox_collection updated to
+match version as necessary.
 
 ##### `params`
 
@@ -1397,6 +1401,11 @@ Data type: `TargetSpec`
 The primary openvox-server host and certificate
 authority.
 
+NOTE: This may be an array, but more than one host will result in
+an ambiguous architecture...see the README.md and
+functions/validate_architecture.pp for details of what *ambiguous*
+means in this context.
+
 ##### <a name="-ovox--install--ovdb_hosts"></a>`ovdb_hosts`
 
 Data type: `TargetSpec`
@@ -1415,10 +1424,12 @@ Array of PostgreSQL hosts for openvoxdb.
 Defaults to the $primary_host. If set to an empty array, no
 Postgresql hosts will be installed in the cluster.
 
+NOTE: More than one postgres host will be *ambiguous*...
+
 NOTE: to use a separate postgres instance like a pre-configured
 cloud instance, set postgres_hosts to the cloud instance so that
 ovdbs are configured to talk to it, and set $manage_postgres to
-false. See also $postgres_credentials.
+false. See also $postgres_credentials (TODO).
 
 Default value: `$primary_host`
 
@@ -1437,6 +1448,11 @@ Data type: `TargetSpec`
 Array of haproxy load-balancers for the
 compiler hosts.
 
+NOTE: More than one compiler_lb is not necessarily ambiguous, but
+only the first host in the array will be used to set agent server
+settings. Configuring fail over or dns for multiple load balancers
+is out of scope for this module.
+
 Default value: `[]`
 
 ##### <a name="-ovox--install--ovdb_lb_hosts"></a>`ovdb_lb_hosts`
@@ -1444,7 +1460,8 @@ Default value: `[]`
 Data type: `TargetSpec`
 
 Array of haproxy load-balancers for the ovdb
-hosts.
+hosts. (more than one *ovdb_lb_hosts* has the same caveat as for
+*compiler_lb_hosts*...)
 
 Default value: `[]`
 
@@ -1452,11 +1469,15 @@ Default value: `[]`
 
 Data type: `TargetSpec`
 
-Array of additional agents to provision.
-Note, the agent will also be installed on all of the above
-server, compiler, compiler lbs, ovdb lbs, ovdb and postgres hosts,
-with the possible exception of $postgres_hosts if
-$manage_postgres is false.
+Array of additional non-infrastructure agents to
+provision. Note that the agent will also be installed on all of
+the above server, compiler, compiler lbs, ovdb lbs, ovdb and
+postgres hosts, with the possible exception of $postgres_hosts if
+$manage_postgres is false, regardless of this setting.
+
+The principal utility of adding *agent_hosts* is to validate that
+catalog compilation through the compiler load balancer is
+successful before plan completion.
 
 Default value: `[]`
 
@@ -1558,8 +1579,8 @@ pointing to a pre-configured Postgresql server (such as a cloud
 instance) that will be handling database queries on behalf of the
 cluster.
 
-If instead the desired configuration is just a simple
-$primary_host that only has openvox-server installed, set
+If instead the desired configuration is just a simple (*tiny*
+arch) $primary_host that only has openvox-server installed, set
 $ovdb_hosts and $postgres_hosts to empty arrays.
 
 Default value: `true`
@@ -1571,7 +1592,7 @@ Data type: `Optional[Hash]`
 Hash of credentials for connecting to a
 pre-configured postgres host. For example, $postgres_hosts set to a
 cloud instance, $manage_postgres set to false).
-TODO: actual structure...
+TODO: actual structure and wiring it up...
 
 Default value: `undef`
 
@@ -1841,7 +1862,9 @@ Default value: `false`
 
 Data type: `String[1]`
 
-
+The directory to write apply result output two if
+*capture_apply_reports* is set. By default this will write to a
+module relative ./reports directory.
 
 Default value: `'ovox/../reports'`
 
@@ -2029,55 +2052,60 @@ The following parameters are available in the `ovox::subplans::validate_architec
 
 Data type: `TargetSpec`
 
-
+The primary openvox-server and
+certificate-authority host for the cluster.
 
 ##### <a name="-ovox--subplans--validate_architecture--ovdb_hosts"></a>`ovdb_hosts`
 
 Data type: `TargetSpec`
 
-
+Array of openvoxdb hosts.
 
 ##### <a name="-ovox--subplans--validate_architecture--postgres_hosts"></a>`postgres_hosts`
 
 Data type: `TargetSpec`
 
-
+Array of postgres hosts.
 
 ##### <a name="-ovox--subplans--validate_architecture--compiler_hosts"></a>`compiler_hosts`
 
 Data type: `TargetSpec`
 
-
+Array of openvox-server compiler hosts.
 
 ##### <a name="-ovox--subplans--validate_architecture--compiler_lb_hosts"></a>`compiler_lb_hosts`
 
 Data type: `TargetSpec`
 
-
+Array of haproxy load-balancers for the
+compiler hosts.
 
 ##### <a name="-ovox--subplans--validate_architecture--ovdb_lb_hosts"></a>`ovdb_lb_hosts`
 
 Data type: `TargetSpec`
 
-
+Array of haproxy load-balancers for the ovdb
+hosts.
 
 ##### <a name="-ovox--subplans--validate_architecture--agent_hosts"></a>`agent_hosts`
 
 Data type: `TargetSpec`
 
-
+Array of non-infrastructure agent hosts.
 
 ##### <a name="-ovox--subplans--validate_architecture--manage_postgres"></a>`manage_postgres`
 
 Data type: `Boolean`
 
-
+Whether postgresql will be installed and
+configured on *postgres_hosts*.
 
 ##### <a name="-ovox--subplans--validate_architecture--compiler_pool_address"></a>`compiler_pool_address`
 
 Data type: `Optional[String[1]]`
 
-
+Optional hostname for the compiler load
+balancer.
 
 Default value: `undef`
 
@@ -2085,7 +2113,8 @@ Default value: `undef`
 
 Data type: `Optional[String[1]]`
 
-
+Optional hostname for the ovdb load
+balancer.
 
 Default value: `undef`
 

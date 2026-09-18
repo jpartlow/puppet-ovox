@@ -5,6 +5,7 @@
 # module, or some external unmanaged PostgreSQL service in the cloud.
 #
 # @param target_map Ovox::TargetMap instance for the cluster.
+# @return True if some Postgresql services are not the primary.
 function ovox::has_separate_postgres(
   Ovox::TargetMap $target_map
 ) >> Boolean {

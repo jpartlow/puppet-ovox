@@ -1,17 +1,18 @@
-# Return the address to the PostgreSQL server that Openvoxdb instances
+# Get the address to the PostgreSQL server that Openvoxdb instances
 # should connect to.
-#
-# If there are no postgres_targets, it will return the first
-# unmanaged_postgres_host entry.
-#
-# Otherwise, the first postgres_target address will be returned.
-#
-# It may return undef if no postgres host information is configured.
 #
 # This function does not address complex configuration scenarios with
 # multiple postgres targets.
 #
+# It returns the first *postgres_targets* entry.
+#
+# If there are no *postgres_targets*, it will return the first
+# *unmanaged_postgres_hosts* entry.
+#
+# It may return undef if no postgres host information is configured.
+#
 # @param target_map Ovox::TargetMap instance for the cluster.
+# @return The Postgresql service address for the cluster or undef.
 function ovox::get_postgres_address(
   Ovox::TargetMap $target_map,
 ) >> Optional[String] {

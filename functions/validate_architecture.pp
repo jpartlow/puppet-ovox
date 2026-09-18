@@ -17,7 +17,13 @@
 # * Errors, which reflect structural problems preventing
 #   classification of the given cluster nodes into discrete roles.
 #
+# This function does not raise any errors itself, merely returns
+# information about them.
+#
 # @param target_map Ovox::TargetMap instance for the cluster.
+# @return
+#   An Ovox::ArchErrors structure with warnings, ambiguities and
+#   errors for the caller.
 function ovox::validate_architecture(
   Ovox::TargetMap $target_map,
 ) >> Ovox::ArchErrors {

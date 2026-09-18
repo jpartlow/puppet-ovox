@@ -2,6 +2,7 @@
 # services defined, either internally or as an external reference.
 #
 # @param target_map Ovox::TargetMap instance for the cluster.
+# @return True if postgres services are defined.
 function ovox::has_postgres(
   Ovox::TargetMap $target_map
 ) >> Boolean {

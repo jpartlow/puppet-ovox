@@ -6,6 +6,23 @@
 # May raise errors for invalid configurations.
 #
 # May raise warnings and pause for confirmation.
+#
+# @param primary_host The primary openvox-server and
+#   certificate-authority host for the cluster.
+# @param ovdb_hosts Array of openvoxdb hosts.
+# @param postgres_hosts Array of postgres hosts.
+# @param compiler_hosts Array of openvox-server compiler hosts.
+# @param compiler_lb_hosts Array of haproxy load-balancers for the
+#   compiler hosts.
+# @param ovdb_lb_hosts Array of haproxy load-balancers for the ovdb
+#   hosts.
+# @param agent_hosts Array of non-infrastructure agent hosts.
+# @param manage_postgres Whether postgresql will be installed and
+#   configured on *postgres_hosts*.
+# @param compiler_pool_address Optional hostname for the compiler load
+#   balancer.
+# @param ovdb_pool_address Optional hostname for the ovdb load
+#   balancer.
 plan ovox::subplans::validate_architecture(
   TargetSpec $primary_host,
   TargetSpec $ovdb_hosts,

@@ -1,4 +1,7 @@
 # Log the report from an ApplyResult in a human readable format.
+#
+# @param ar The ApplyResult to log.
+# @return True on completion.
 function ovox::log_apply_report(
   ApplyResult $ar
 ) {

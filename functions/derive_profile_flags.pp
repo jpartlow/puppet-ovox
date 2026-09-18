@@ -1,4 +1,4 @@
-# Return a map of profile flags based on cluster TargetMap.
+# Generate a map of profile flags based on cluster TargetMap.
 #
 # Intended to populate hiera data to inform key primary and ovdb roles
 # as to which profiles to include for this cluster.
@@ -11,7 +11,10 @@
 #
 # All other cases are ambiguous, and require manual configuration.
 #
-# @param target_map Ovox::TargetMap instance for the cluster.
+# @param target_map
+#   Ovox::TargetMap instance for the cluster.
+# @return
+#   A Hash of profile flags to be included in cluster hiera data.
 function ovox::derive_profile_flags(
   Ovox::TargetMap $target_map,
 ) >> Hash[String,Boolean] {
@@ -24,7 +27,7 @@ function ovox::derive_profile_flags(
 
   $ovdb_flags = ovox::has_separate_ovdbs($target_map) ? {
     true => {
-      'ov_role::ovdb::install_postgres' => 
+      'ov_role::ovdb::install_postgres' =>
         ovox::role_includes('ovdb', 'postgres', $target_map)
     },
     default => {},

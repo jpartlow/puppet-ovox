@@ -5,5 +5,3 @@ group :test do
   gem 'puppet_metadata', '~> 6.1',  :require => false
   gem 'openbolt', '~> 5.0' # provides bolt_spec for tests
 end
-
-

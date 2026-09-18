@@ -2,6 +2,8 @@
 # services that are not on the primary.
 #
 # @param target_map Ovox::TargetMap instance for the cluster.
+# @return
+#   True if some openvoxdb service hosts are not the primary.
 function ovox::has_separate_ovdbs(
   Ovox::TargetMap $target_map
 ) >> Boolean {

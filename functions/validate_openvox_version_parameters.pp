@@ -8,9 +8,11 @@
 # If we're installing a pre-release version, then the version
 # must be explicit, not 'latest', and collection is ignored.
 #
-# @param params The OpenVox install parameters to validate.
-# @return Ovox::Openvox_install_params with
-#   openvox_collection updated to match version as necessary.
+# @param params
+#   The OpenVox install parameters to validate.
+# @return
+#   Ovox::Openvox_install_params with openvox_collection updated to
+#   match version as necessary.
 function ovox::validate_openvox_version_parameters(
   Ovox::Openvox_install_params $params,
 ) >> Ovox::Openvox_install_params {
