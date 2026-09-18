@@ -1,0 +1,164 @@
+---
+name: 'Install Plan Tests'
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+env:
+  # Suppress warnings about Bolt gem versus package use.
+  BOLT_GEM: true
+
+jobs:
+  install-openvox-collection:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os:
+          - ['rocky', '8', 'x86_64']
+          - ['rocky', '9', 'x86_64']
+          - ['rocky', '10', 'x86_64']
+          - ['debian', '12', 'amd64']
+          - ['debian', '13', 'amd64']
+          - ['ubuntu', '2404', 'amd64']
+          - ['ubuntu', '2604', 'amd64']
+        cluster:
+          - id: 'tiny'
+            # nested_vms specification
+            vms: |-
+              [
+                {
+                  "role": "primary",
+                  "cpus": 2,
+                  "mem_mb": 3072
+                },
+                {
+                  "role": "agent",
+                  "cpus": 1,
+                  "mem_mb": 1024
+                }
+              ]
+            # ovox::install plan parameters
+            params: |-
+              {
+                "cluster_id": "tiny",
+                "primary_host": "tiny-primary-1.vm",
+                "agent_hosts": ["tiny-agent-1.vm"]
+              }
+
+          - id: 'small'
+            vms: |-
+              [
+                {
+                  "role": "primary",
+                  "cpus": 4,
+                  "mem_mb": 4096
+                },
+                {
+                  "role": "agent",
+                  "cpus": 1,
+                  "mem_mb": 1024
+                }
+              ]
+            params: |-
+              {
+                "cluster_id": "small",
+                "primary_host": "small-primary-1.vm",
+                "agent_hosts": ["small-agent-1.vm"]
+              }
+          - id: 'medium'
+            vms: |-
+              [
+                {
+                  "role": "primary",
+                  "cpus": 2,
+                  "mem_mb": 3072
+                },
+                {
+                  "role": "compiler",
+                  "cpus": 2,
+                  "mem_mb": 2048
+                },
+                {
+                  "role": "compiler",
+                  "cpus": 2,
+                  "mem_mb": 2048
+                },
+                {
+                  "role": "clb",
+                  "cpus": 1,
+                  "mem_mb": 1024
+                },
+                {
+                  "role": "agent",
+                  "cpus": 1,
+                  "mem_mb": 1024
+                }
+              ]
+            params: |-
+              {
+                "cluster_id": "medium",
+                "primary_host": "medium-primary-1.vm",
+                "compiler_hosts": [
+                  "medium-compiler-1.vm",
+                  "medium-compiler-2.vm"
+                ],
+                "compiler_lb_hosts": ["medium-clb-1.vm"],
+                "agent_hosts": ["medium-agent-1.vm"]
+              }
+    steps:
+      - uses: actions/checkout@v6
+      - id: vm-cluster
+        uses: jpartlow/nested_vms@v1
+        with:
+          cluster_id: ${{ matrix.cluster.id }}
+          os: ${{ matrix.os[0] }}
+          os-version: ${{ matrix.os[1] }}
+          os-arch: ${{ matrix.os[2] }}
+          # The ovox::install plan handles this.
+          install-openvox: false
+          vms: ${{ matrix.cluster.vms }}
+      - name: Run bundler
+        run: bundle install
+      - name: Install Bolt
+        shell: bash
+        env:
+          APT_REPOSITORY: apt.voxpupuli.org
+        run: |-
+          OS_MAJOR=$(bundle exec facter os.release.major)
+          RELEASE_PACKAGE="openvox8-release-ubuntu${OS_MAJOR}.deb"
+          wget https://${APT_REPOSITORY}/${RELEASE_PACKAGE}
+          sudo dpkg -i ${RELEASE_PACKAGE}
+          sudo apt update
+          sudo apt install -y openbolt
+      - name: Install ovox modules
+        run: /opt/puppetlabs/bin/bolt module install
+      - name: Add kvm_automation_tooling to Bolt .modules
+        # The kvm_automation_tooling module is itself a Bolt module
+        # and it uses a tasks/resolve_reference.rb to extract uri
+        # information from the terraform data for the inventory.
+        #
+        # I'm linking it here manually into puppet-ovox's Bolt
+        # .modules path in order to make use of the generated inventory
+        # for the vms we created above.
+        run: |-
+          cd .modules
+          ln -s ../kvm_automation_tooling kvm_automation_tooling
+      - name: Write params.json
+        env:
+          PARAMS_FILE: ${{ format('params.{0}.json', matrix.cluster.id) }}
+          PARAMS_CONTENT: ${{ matrix.cluster.params }}
+        run: |-
+          cat > "${PARAMS_FILE}" <<EOF
+          ${PARAMS_CONTENT}
+          EOF
+      - name: Run ovox::install
+        env:
+          INVENTORY_FILE: ${{ format('kvm_automation_tooling/terraform/instances/inventory.{0}.yaml', matrix.cluster.id) }}
+          PARAMS_FILE: ${{ format('params.{0}.json', matrix.cluster.id) }}
+        run: /opt/puppetlabs/bin/bolt plan run ovox::install --inventory "${INVENTORY_FILE}" --params "@${PARAMS_FILE}"
