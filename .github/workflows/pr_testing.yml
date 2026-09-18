@@ -1,0 +1,55 @@
+---
+name: 'PR Tests'
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  rspec:
+    strategy:
+      matrix:
+        ruby-version:
+          - '3.3'
+          - '3.4'
+          - '4.0'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: ${{ matrix.ruby-version }}
+          bundler-cache: true
+      - name: Install module dependencies
+        run: bundle exec bolt module install
+      - name: Symlink ruby_task_helper
+        run: |-
+          ln -s puppet-ovox/.modules/ruby_task_helper ../ruby_task_helper
+      - name: Run RSpec
+        run: bundle exec rspec
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.4'
+          bundler-cache: true
+      - name: Run puppet-lint
+        run: bundle exec puppet-lint --no-autoloader_layout-check manifests functions plans types
+  reference-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: '3.3'
+          bundler-cache: true
+      - name: Regenerate REFERENCE.md
+        run: bundle exec puppet strings generate --format markdown
+      - name: Check whether REFERENCE.md has uncommitted changes
+        run: git diff --exit-code REFERENCE.md

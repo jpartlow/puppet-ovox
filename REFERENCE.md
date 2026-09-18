@@ -4,6 +4,10 @@
 
 ## Table of Contents
 
+### Classes
+
+* [`ovox`](#ovox): ATM this is just a placeholder for the module so that rspec-puppet can get_module_name and setup the spec/fixtures/modules link correctly.
+
 ### Functions
 
 * [`ovox::all_agent_targets`](#ovox--all_agent_targets): All nodes that need to be earmarked for agent installation so that we can later manage them with OpenVox.
@@ -70,6 +74,13 @@
 * [`ovox::subplans::install_component`](#ovox--subplans--install_component): Installs a single openvox component on behalf of the caller.  Uses puppet-openvox_bootstrap tasks.
 * [`ovox::subplans::install_openvox`](#ovox--subplans--install_openvox): Install OpenVox Puppet agents and primary services on the cluster without any attempts at configuration.  The openvox_* install parameters ar
 * [`ovox::subplans::validate_architecture`](#ovox--subplans--validate_architecture): Given cluster host information, validate the architecture and return an Ovox::TargetMap structure with Target arrays and host configuration i
+
+## Classes
+
+### <a name="ovox"></a>`ovox`
+
+ATM this is just a placeholder for the module so that rspec-puppet can
+get_module_name and setup the spec/fixtures/modules link correctly.
 
 ## Functions
 
