@@ -116,14 +116,19 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - id: vm-cluster
-        uses: jpartlow/nested_vms@v1
+        # TODO: set back to v1 after dependent prs merged
+        uses: jpartlow/nested_vms@provide-kvm-ref-as-input
         with:
+          # TODO: remove kat_ref after dependent prs merged
+          kat_ref: resolve-fqdn-for-inventory
           cluster_id: ${{ matrix.cluster.id }}
           os: ${{ matrix.os[0] }}
           os-version: ${{ matrix.os[1] }}
           os-arch: ${{ matrix.os[2] }}
           # The ovox::install plan handles this.
           install-openvox: false
+          # Do not setup inter-vm ssh between primary and other nodes.
+          setup-cluster-ssh: false
           vms: ${{ matrix.cluster.vms }}
       - name: Run bundler
         run: bundle install
