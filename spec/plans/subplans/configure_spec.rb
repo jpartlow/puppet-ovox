@@ -78,6 +78,7 @@ describe 'plan: ovox::subplans::configure' do
             'ovdb_targets' => [primary],
           }
         )
+      allow_apply_prep
       allow_apply
       expect_task('openvox_bootstrap::configure').
         with_targets([agent]).
@@ -189,6 +190,7 @@ describe 'plan: ovox::subplans::configure' do
             'ovdb_targets' => [ovdb1, ovdb2],
           }
         )
+      allow_apply_prep
       allow_apply
       expect_task('openvox_bootstrap::configure').
         with_targets([agent]).
