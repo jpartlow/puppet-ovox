@@ -27,6 +27,7 @@ describe 'plan: ovox::subplans::install_openvox' do
         'apt_source' => 'https://apt.voxpupuli.org',
         'yum_source' => 'https://yum.voxpupuli.org',
         'stop_service' => false,
+        'force_release_package' => true,
         '_catch_errors' => true,
       })
     expect_task('package')
@@ -61,6 +62,7 @@ describe 'plan: ovox::subplans::install_openvox' do
         'apt_source' => 'https://apt.voxpupuli.org',
         'yum_source' => 'https://yum.voxpupuli.org',
         'stop_service' => false,
+        'force_release_package' => true,
         '_catch_errors' => true,
       })
     expect_task('package')
@@ -130,6 +132,7 @@ describe 'plan: ovox::subplans::install_openvox' do
           'apt_source' => 'https://apt.voxpupuli.org',
           'yum_source' => 'https://yum.voxpupuli.org',
           'stop_service' => false,
+          'force_release_package' => true,
           '_catch_errors' => true,
         })
       expect_task('openvox_bootstrap::install')
@@ -140,6 +143,7 @@ describe 'plan: ovox::subplans::install_openvox' do
           'collection' => 'openvox8',
           'apt_source' => 'https://apt.voxpupuli.org',
           'yum_source' => 'https://yum.voxpupuli.org',
+          'force_release_package' => false,
           'stop_service' => false,
           '_catch_errors' => true,
         })
@@ -151,6 +155,7 @@ describe 'plan: ovox::subplans::install_openvox' do
           'collection' => 'openvox8',
           'apt_source' => 'https://apt.voxpupuli.org',
           'yum_source' => 'https://yum.voxpupuli.org',
+          'force_release_package' => false,
           'stop_service' => false,
           '_catch_errors' => true,
         })
@@ -162,6 +167,7 @@ describe 'plan: ovox::subplans::install_openvox' do
           'collection' => 'openvox8',
           'apt_source' => 'https://apt.voxpupuli.org',
           'yum_source' => 'https://yum.voxpupuli.org',
+          'force_release_package' => false,
           'stop_service' => false,
           '_catch_errors' => true,
         })
@@ -234,6 +240,7 @@ describe 'plan: ovox::subplans::install_openvox' do
           'apt_source' => 'https://apt.voxpupuli.org',
           'yum_source' => 'https://yum.voxpupuli.org',
           'stop_service' => false,
+          'force_release_package' => true,
           '_catch_errors' => true,
         })
       allow_apply
@@ -254,6 +261,7 @@ describe 'plan: ovox::subplans::install_openvox' do
           'apt_source' => 'https://apt.voxpupuli.org',
           'yum_source' => 'https://yum.voxpupuli.org',
           'stop_service' => false,
+          'force_release_package' => false,
           '_catch_errors' => true,
         })
       expect_task('openvox_bootstrap::install')
@@ -265,6 +273,7 @@ describe 'plan: ovox::subplans::install_openvox' do
           'apt_source' => 'https://apt.voxpupuli.org',
           'yum_source' => 'https://yum.voxpupuli.org',
           'stop_service' => false,
+          'force_release_package' => false,
           '_catch_errors' => true,
         })
       expect_task('package').be_called_times(4)
@@ -296,6 +305,7 @@ describe 'plan: ovox::subplans::install_openvox' do
             'apt_source' => 'https://apt.voxpupuli.org',
             'yum_source' => 'https://yum.voxpupuli.org',
             'stop_service' => false,
+            'force_release_package' => true,
             '_catch_errors' => true,
           })
         expect_task('openvox_bootstrap::install')
@@ -307,6 +317,7 @@ describe 'plan: ovox::subplans::install_openvox' do
             'apt_source' => 'https://apt.voxpupuli.org',
             'yum_source' => 'https://yum.voxpupuli.org',
             'stop_service' => false,
+            'force_release_package' => false,
             '_catch_errors' => true,
           })
         expect_task('openvox_bootstrap::install')
@@ -318,6 +329,7 @@ describe 'plan: ovox::subplans::install_openvox' do
             'apt_source' => 'https://apt.voxpupuli.org',
             'yum_source' => 'https://yum.voxpupuli.org',
             'stop_service' => false,
+            'force_release_package' => false,
             '_catch_errors' => true,
           })
         expect_task('package').be_called_times(3)
@@ -354,6 +366,7 @@ describe 'plan: ovox::subplans::install_openvox' do
             'apt_source' => 'https://apt.voxpupuli.org',
             'yum_source' => 'https://yum.voxpupuli.org',
             'stop_service' => false,
+            'force_release_package' => true,
             '_catch_errors' => true,
           })
         expect_task('openvox_bootstrap::install')
@@ -365,6 +378,7 @@ describe 'plan: ovox::subplans::install_openvox' do
             'apt_source' => 'https://apt.voxpupuli.org',
             'yum_source' => 'https://yum.voxpupuli.org',
             'stop_service' => false,
+            'force_release_package' => false,
             '_catch_errors' => true,
           })
         expect_task('package').be_called_times(2)
@@ -415,6 +429,7 @@ describe 'plan: ovox::subplans::install_openvox' do
             'apt_source' => 'https://apt.voxpupuli.org',
             'yum_source' => 'https://yum.voxpupuli.org',
             'stop_service' => false,
+            'force_release_package' => true,
             '_catch_errors' => true,
           })
         expect_task('openvox_bootstrap::install')
@@ -426,6 +441,7 @@ describe 'plan: ovox::subplans::install_openvox' do
             'apt_source' => 'https://apt.voxpupuli.org',
             'yum_source' => 'https://yum.voxpupuli.org',
             'stop_service' => false,
+            'force_release_package' => false,
             '_catch_errors' => true,
           })
         expect_task('openvox_bootstrap::install')
@@ -437,6 +453,7 @@ describe 'plan: ovox::subplans::install_openvox' do
             'apt_source' => 'https://apt.voxpupuli.org',
             'yum_source' => 'https://yum.voxpupuli.org',
             'stop_service' => false,
+            'force_release_package' => false,
             '_catch_errors' => true,
           })
         expect_task('openvox_bootstrap::install')
@@ -448,6 +465,7 @@ describe 'plan: ovox::subplans::install_openvox' do
             'apt_source' => 'https://apt.voxpupuli.org',
             'yum_source' => 'https://yum.voxpupuli.org',
             'stop_service' => false,
+            'force_release_package' => false,
             '_catch_errors' => true,
           })
         expect_task('openvox_bootstrap::install')
@@ -459,6 +477,7 @@ describe 'plan: ovox::subplans::install_openvox' do
             'apt_source' => 'https://apt.voxpupuli.org',
             'yum_source' => 'https://yum.voxpupuli.org',
             'stop_service' => false,
+            'force_release_package' => false,
             '_catch_errors' => true,
           })
         expect_task('package').be_called_times(5)
