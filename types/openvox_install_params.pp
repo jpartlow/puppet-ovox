@@ -14,9 +14,13 @@
 # - openvox_artifacts_url: The URL to the OpenVox artifacts server.
 #   Generally this can be skipped if the packages you are looking for
 #   are on the artifacts.voxpupuli.org server.
+# - force_release_package: If set false, only installs the release
+#   package if it is not already installed. This can save time when
+#   installing multiple openvox packages on a node.
 type Ovox::Openvox_install_params = Struct[{
   Optional[openvox_version]       => Ovox::Openvox_version,
   Optional[openvox_collection]    => Ovox::Openvox_collection,
   Optional[openvox_released]      => Boolean,
   Optional[openvox_artifacts_url] => Optional[Stdlib::HTTPUrl],
+  Optional[force_release_package] => Boolean,
 }]

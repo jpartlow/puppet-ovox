@@ -23,15 +23,24 @@ plan ovox::subplans::install_component(
   out::message("Installing ${package} ${version} (${collection})")
 
   if $released {
+    $force_release_package = $install_params['force_release_package']
+    $final_install_params = $force_release_package =~ NotUndef ? {
+      true    => {
+        'force_release_package' =>  $force_release_package,
+      },
+      default => {},
+    } + {
+      'package'       => $package,
+      'version'       => $version,
+      'collection'    => $collection,
+      '_catch_errors' => true,
+    }
     # Loop in case of package manager locks from another process.
     $installed = ctrl::do_until(limit => 5, interval => 10) || {
       $install_results = run_task(
         'openvox_bootstrap::install',
         $targets,
-        'package'      => $package,
-        'version'      => $version,
-        'collection'   => $collection,
-        '_catch_errors' => true,
+        $final_install_params,
       )
       ovox::test_results("Error installing ${package}", $install_results)
     }
