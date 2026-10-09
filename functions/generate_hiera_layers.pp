@@ -112,6 +112,18 @@ function ovox::generate_hiera_layers(
       $ovdb_base_config = {
         'openvoxdb::server::database_host' =>
           ovox::get_postgres_address($target_map),
+        # TODO: Firewall management is out of scope, for the moment,
+        # and should not be done piecemeal. On el (rocky8 at least)
+        # keeping the default of openvoxdb manage_firewall true causes
+        # an include of puppetlabs-firewall, which installs
+        # iptables/iptables-services that brings in a minimal firewall
+        # excluding all services (such as 8140...). This breaks multi
+        # node infra tests for cloud images.
+        #
+        # Assume for now that whatever servers are brought to the plan
+        # have their firewalls in an appropriate state for openvox
+        # services.
+        'openvoxdb::server::manage_firewall' => false,
       }
       $ovdb_credentials_config = $managed_postgres ? {
         true    => {

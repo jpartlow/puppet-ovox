@@ -36,6 +36,7 @@ describe 'ovox::generate_hiera_layers' do
       'openvoxdb::master::config::manage_storeconfigs' => false,
       'openvoxdb::master::config::restart_puppet' => false,
       'openvoxdb::master::config::strict_validation' => false,
+      'openvoxdb::server::manage_firewall' => false,
     }
   end
   let(:ovdb_server_common_config) do
