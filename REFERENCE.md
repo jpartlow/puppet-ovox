@@ -39,7 +39,7 @@
 * [`ovox::separate_ovdb_targets`](#ovox--separate_ovdb_targets): Returns an array of openvoxdb targets to manage that are not the primary openvox-server target.
 * [`ovox::separate_postgres_targets`](#ovox--separate_postgres_targets): Returns an array of PostgreSQL targets to manage that are not the primary openvox-server target and not a separate openvoxdb target.
 * [`ovox::subset_of`](#ovox--subset_of): Test whether the first array's elements are a subset of the second array.
-* [`ovox::test_results`](#ovox--test_results): This function is used in do_until loops to log errors from a result set while returning the overall status of the result for the loop.  It's 
+* [`ovox::test_results`](#ovox--test_results): This function is used in do_until loops to log errors from a result set while returning the overall status of the result for the loop.  It's
 * [`ovox::transform_openvox_host_version_results`](#ovox--transform_openvox_host_version_results): Transform the PlanResult ResultSet of package version hashes returned by the ovox::subplans::install_component plan into a Hash of host names
 * [`ovox::validate_architecture`](#ovox--validate_architecture): Validate the given cluster TargetMap for architectural and role errors and return an array of any errors found.  There are constraints to wha
 * [`ovox::validate_openvox_version_parameters`](#ovox--validate_openvox_version_parameters): Validates the given set of OpenVox install parameters and raises an error for any problems.  If we're installing a released version, then col
@@ -2132,4 +2132,3 @@ Optional hostname for the ovdb load
 balancer.
 
 Default value: `undef`
-
