@@ -78,6 +78,7 @@ describe 'plan: ovox::subplans::configure' do
             'ovdb_targets' => [primary],
           }
         )
+      allow_apply_prep
       allow_apply
       expect_task('openvox_bootstrap::configure').
         with_targets([agent]).
@@ -116,6 +117,7 @@ describe 'plan: ovox::subplans::configure' do
           'openvoxdb::master::config::restart_puppet' => false,
           'openvoxdb::master::config::strict_validation' => false,
           'openvoxdb::server::database_host' => 'primary.spec',
+          'openvoxdb::server::manage_firewall' => false,
           'openvoxdb::server::postgresql_ssl_on' => true,
           'ov_profile::postgres::additional_ovdb_servers' => [],
           'puppet::agent_manage_environment' => false,
@@ -189,6 +191,7 @@ describe 'plan: ovox::subplans::configure' do
             'ovdb_targets' => [ovdb1, ovdb2],
           }
         )
+      allow_apply_prep
       allow_apply
       expect_task('openvox_bootstrap::configure').
         with_targets([agent]).
@@ -228,6 +231,7 @@ describe 'plan: ovox::subplans::configure' do
           'openvoxdb::master::config::restart_puppet' => false,
           'openvoxdb::master::config::strict_validation' => false,
           'openvoxdb::server::database_host' => 'postgres.spec',
+          'openvoxdb::server::manage_firewall' => false,
           'openvoxdb::server::postgresql_ssl_on' => true,
           'ov_profile::postgres::additional_ovdb_servers' => ['ovdb2.spec'],
           'puppet::agent_manage_environment' => false,

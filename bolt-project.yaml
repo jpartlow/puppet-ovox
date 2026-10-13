@@ -17,5 +17,9 @@ modules:
     version_requirement: '>= 1.0.0 < 2.0.0'
   - name: puppetlabs/stdlib
     version_requirement: '>= 9.7 < 10.0.0'
-  - name: puppet/openvox_bootstrap
-    version_requirement: '>= 1.4.0 < 2.0.0'
+#  - name: puppet/openvox_bootstrap
+#    version_requirement: '>= 1.4.0 < 2.0.0'
+  # XXX: temporarily pin to openvox_bootstrap main for
+  # force_release_package flag. Undo this when released. 
+  - git: https://github.com/voxpupuli/puppet-openvox_bootstrap
+    ref: main 
