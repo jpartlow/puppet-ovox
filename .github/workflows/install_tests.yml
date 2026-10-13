@@ -79,7 +79,7 @@ jobs:
                 {
                   "role": "primary",
                   "cpus": 2,
-                  "mem_mb": 3072
+                  "mem_mb": 4096
                 },
                 {
                   "role": "compiler",
