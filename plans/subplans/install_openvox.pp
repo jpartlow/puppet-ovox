@@ -90,6 +90,13 @@ plan ovox::subplans::install_openvox(
   # Collect facts and add them to the targets.
   run_plan('facts', 'targets' => $all_targets)
 
+  $server_defaults = {
+    # Since the release package has already been installed during the
+    # agent installation above, do not take the time to re-download
+    # and install the release package and bust the package manager
+    # cache in the process.
+    'force_release_package' => false,
+  } + $install_defaults
   $server_installations = [
     # XXX: There is a minor optimization that could be done here, if
     # $openvox_server_params == $openvox_compiler_params...
@@ -110,7 +117,7 @@ plan ovox::subplans::install_openvox(
       'targets'  => $targets,
       'package'  => $package,
       'params'   => $params,
-      'defaults' => $install_defaults,
+      'defaults' => $server_defaults,
     )
 
     ovox::transform_openvox_host_version_results(
