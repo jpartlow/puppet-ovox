@@ -20,6 +20,9 @@ jobs:
       fail-fast: false
       matrix:
         os:
+          - ['almalinux', '8', 'x86_64']
+          - ['almalinux', '9', 'x86_64']
+          - ['almalinux', '10', 'x86_64']
           - ['rocky', '8', 'x86_64']
           - ['rocky', '9', 'x86_64']
           - ['rocky', '10', 'x86_64']
@@ -112,6 +115,118 @@ jobs:
                 ],
                 "compiler_lb_hosts": ["medium-clb-1.vm"],
                 "agent_hosts": ["medium-agent-1.vm"]
+              }
+          - id: 'large'
+            vms: |-
+              [
+                {
+                  "role": "primary",
+                  "cpus": 2,
+                  "mem_mb": 4096
+                },
+                {
+                  "role": "postgres",
+                  "cpus": 2,
+                  "mem_mb": 4096
+                },
+                {
+                  "role": "compiler",
+                  "cpus": 2,
+                  "mem_mb": 2048
+                },
+                {
+                  "role": "compiler",
+                  "cpus": 2,
+                  "mem_mb": 2048
+                },
+                {
+                  "role": "clb",
+                  "cpus": 1,
+                  "mem_mb": 1024
+                },
+                {
+                  "role": "agent",
+                  "cpus": 1,
+                  "mem_mb": 1024
+                }
+              ]
+            params: |-
+              {
+                "cluster_id": "large",
+                "primary_host": "large-primary-1.vm",
+                "postgres_hosts": "large-postgres-1.vm",
+                "compiler_hosts": [
+                  "large-compiler-1.vm",
+                  "large-compiler-2.vm"
+                ],
+                "compiler_lb_hosts": ["large-clb-1.vm"],
+                "agent_hosts": ["large-agent-1.vm"]
+              }
+          - id: 'huge'
+            vms: |-
+              [
+                {
+                  "role": "primary",
+                  "cpus": 2,
+                  "mem_mb": 3072
+                },
+                {
+                  "role": "postgres",
+                  "cpus": 2,
+                  "mem_mb": 2048
+                },
+                {
+                  "role": "ovdb",
+                  "cpus": 2,
+                  "mem_mb": 1024
+                },
+                {
+                  "role": "ovdb",
+                  "cpus": 2,
+                  "mem_mb": 1024
+                },
+                {
+                  "role": "ovdblb",
+                  "cpus": 1,
+                  "mem_mb": 1024
+                },
+                {
+                  "role": "compiler",
+                  "cpus": 2,
+                  "mem_mb": 2048
+                },
+                {
+                  "role": "compiler",
+                  "cpus": 2,
+                  "mem_mb": 2048
+                },
+                {
+                  "role": "clb",
+                  "cpus": 1,
+                  "mem_mb": 1024
+                },
+                {
+                  "role": "agent",
+                  "cpus": 1,
+                  "mem_mb": 1024
+                }
+              ]
+            params: |-
+              {
+                "cluster_id": "huge",
+                "primary_host": "huge-primary-1.vm",
+                "postgres_hosts": "huge-postgres-1.vm",
+                "ovdb_hosts": [
+                  "huge-ovdb-1.vm",
+                  "huge-ovdb-2.vm"
+                ],
+                "ovdb_lb_hosts": ["huge-ovdblb-1.vm"],
+                "compiler_hosts": [
+                  "huge-compiler-1.vm",
+                  "huge-compiler-2.vm"
+                ],
+                "compiler_lb_hosts": ["huge-clb-1.vm"],
+                "agent_hosts": ["huge-agent-1.vm"]
               }
     steps:
       - uses: actions/checkout@v6
