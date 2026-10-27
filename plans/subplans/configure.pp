@@ -233,6 +233,16 @@ plan ovox::subplans::configure(
     $role_map['primary'] + $role_map['compiler'] + $role_map['compiler_lb']
   ].map() |$targets| {
     if !$targets.empty() {
+      # The openvox-agent is already installed by previous
+      # ovox::subplans::install execution, but we need apply_prep to
+      # pluginsync modules so that facts like puppet-systemd's systemd
+      # fact are present.
+      apply_prep($targets)
+      # Hiera lookups within this apply depend on the pathing in
+      # ./hiera.yaml, which requires %cluster_id and %role.
+      # In this case the plan's $cluster_id top level variable
+      # provides %cluster_id, and the target's var['role'] variable
+      # provides %role.
       $apply_resultset = apply($targets, '_catch_errors' => true) {
         # The role var has been set in the Target.vars.
         include("ov_role::${role}")
